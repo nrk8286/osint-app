@@ -2,7 +2,6 @@
 Database storage for OSINT data.
 """
 import os
-import json
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from tinydb import TinyDB, Query

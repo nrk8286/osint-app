@@ -1,8 +1,8 @@
 """
 Web scraper collector for general web searches.
+Note: Current implementation uses placeholder data.
+For production use, integrate with real search APIs or web scraping libraries.
 """
-import requests
-from bs4 import BeautifulSoup
 from typing import List, Dict, Any
 import time
 from .base import BaseCollector
