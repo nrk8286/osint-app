@@ -1,0 +1,47 @@
+============================================================
+OSINT MONITORING REPORT
+============================================================
+Generated: 2025-10-29 03:56:56
+
+OVERVIEW
+------------------------------------------------------------
+Total Mentions: 12
+
+SENTIMENT ANALYSIS
+------------------------------------------------------------
+Positive: 0 (0.0%)
+Negative: 0 (0.0%)
+Neutral:  12 (100.0%)
+Average Polarity: 0.017
+
+SOURCES
+------------------------------------------------------------
+web_search: 3
+news: 3
+twitter: 3
+reddit: 3
+
+RECENT MENTIONS (TOP 5)
+------------------------------------------------------------
+
+1. [web_search] by web_crawler
+   Sample mention of Python from web search
+   Sentiment: neutral (polarity: 0.00)
+
+2. [web_search] by web_crawler
+   Sample mention of Machine Learning from web search
+   Sentiment: neutral (polarity: 0.00)
+
+3. [web_search] by web_crawler
+   Sample mention of AI from web search
+   Sentiment: neutral (polarity: 0.00)
+
+4. [news] by News Source
+   Breaking news about Python
+   Sentiment: neutral (polarity: 0.00)
+
+5. [news] by News Source
+   Breaking news about Machine Learning
+   Sentiment: neutral (polarity: 0.00)
+
+============================================================
