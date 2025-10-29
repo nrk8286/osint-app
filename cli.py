@@ -242,10 +242,15 @@ Examples:
         
         # Export if requested
         if args.export:
-            results = app.export_results(mentions)
-            with open(args.export, 'w') as f:
-                json.dump(results, f, indent=2)
-            print_success(f"Results exported to {args.export}")
+            try:
+                results = app.export_results(mentions)
+                with open(args.export, 'w') as f:
+                    json.dump(results, f, indent=2, default=str)
+                print_success(f"Results exported to {args.export}")
+            except (IOError, OSError) as e:
+                print_error(f"Failed to export results: {e}")
+            except Exception as e:
+                print_error(f"Error during export: {e}")
         
     except Exception as e:
         print_error(f"An error occurred: {e}")

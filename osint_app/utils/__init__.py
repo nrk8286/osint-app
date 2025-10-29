@@ -25,7 +25,8 @@ def analyze_sentiment(text: str) -> str:
             return 'negative'
         else:
             return 'neutral'
-    except Exception as e:
+    except (ValueError, AttributeError, TypeError):
+        # Return neutral if sentiment analysis fails
         return 'neutral'
 
 

@@ -20,13 +20,15 @@ class TwitterMonitor(BaseMonitor):
     def _init_client(self):
         """Initialize Twitter API client if credentials are available."""
         if self.api_key and self.api_secret:
-            try:
-                import tweepy
-                # Note: This is a placeholder for actual Twitter API integration
-                # In production, you would initialize the Tweepy client here
-                self._client = None  # Placeholder
-            except ImportError:
-                self._client = None
+            # Note: This is a placeholder for actual Twitter API integration
+            # In production, you would initialize the Tweepy client here:
+            # try:
+            #     import tweepy
+            #     auth = tweepy.OAuthHandler(self.api_key, self.api_secret)
+            #     self._client = tweepy.API(auth)
+            # except ImportError:
+            #     self._client = None
+            self._client = None  # Placeholder for demo mode
     
     def is_available(self) -> bool:
         """Check if Twitter monitor is available."""
