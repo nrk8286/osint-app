@@ -216,13 +216,9 @@ class DatabaseStorage:
         with self.get_session() as session:
             cutoff = datetime.now() - timedelta(days=days)
             result = session.execute(select(MentionDB).where(MentionDB.timestamp < cutoff))
-            count = len(result.scalars().all())
-            session.execute(MentionDB.__table__.delete().where(MentionDB.timestamp < cutoff))
-            return count
-
-
-"""
-Database storage for OSINT data.
+                MentionDB.__table__.delete().where(MentionDB.timestamp < cutoff)
+            )
+            return result.rowcount or 0
 """
 import os
 from typing import List, Dict, Any, Optional
