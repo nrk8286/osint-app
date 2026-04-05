@@ -10,7 +10,6 @@ try:
     from rich.table import Table
     from rich.progress import Progress, SpinnerColumn, TextColumn
     from rich.panel import Panel
-    from rich import print as rprint
 
     RICH_AVAILABLE = True
 except ImportError:
