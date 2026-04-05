@@ -5,9 +5,44 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
 from datetime import datetime, timedelta
 import asyncio
+from enum import Enum
+from pydantic import BaseModel
 
 from osint_app.core.monitor import OSINTMonitor
-from osint_app.models.schemas import Mention, SearchQuery, SourceType
+try:
+    from osint_app.models.schemas import Mention, SearchQuery, SourceType
+except ModuleNotFoundError:
+    class SourceType(str, Enum):
+        """Fallback source type enum when shared schemas module is unavailable."""
+        reddit = "reddit"
+        twitter = "twitter"
+        news = "news"
+        web = "web"
+        forum = "forum"
+        blog = "blog"
+
+    class SearchQuery(BaseModel):
+        """Fallback request model for search operations."""
+        keyword: str
+        sources: Optional[List[SourceType]] = None
+        limit: int = 100
+        start_date: Optional[datetime] = None
+        end_date: Optional[datetime] = None
+
+    class Mention(BaseModel):
+        """Fallback response model for mention records."""
+        id: Optional[int] = None
+        keyword: Optional[str] = None
+        source: Optional[SourceType] = None
+        text: Optional[str] = None
+        url: Optional[str] = None
+        author: Optional[str] = None
+        timestamp: Optional[datetime] = None
+        sentiment: Optional[str] = None
+        confidence: Optional[float] = None
+
+        class Config:
+            extra = "allow"
 from osint_app.storage.database import DatabaseStorage
 from osint_app.core.config import config
 
