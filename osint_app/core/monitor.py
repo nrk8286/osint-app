@@ -5,7 +5,27 @@ from typing import List, Optional
 from datetime import datetime
 import pandas as pd
 
-from osint_app.models.schemas import Mention, SearchQuery
+try:
+    from osint_app.models.schemas import Mention, SearchQuery
+except ModuleNotFoundError as exc:
+    if exc.name not in {"osint_app.models", "osint_app.models.schemas"}:
+        raise
+
+    from pydantic import BaseModel, ConfigDict
+
+    class Mention(BaseModel):
+        """Fallback mention schema used when the shared schemas module is unavailable."""
+
+        model_config = ConfigDict(extra='allow')
+
+    class SearchQuery(BaseModel):
+        """Fallback search query schema used when the shared schemas module is unavailable."""
+
+        keyword: str
+        google_results: int = 10
+        twitter_results: int = 10
+        reddit_results: int = 10
+        news_results: int = 10
 from osint_app.sources.google import GoogleSource
 from osint_app.sources.twitter import TwitterSource
 from osint_app.sources.reddit import RedditSource
