@@ -3,10 +3,10 @@
 from typing import Optional, List
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine, select, func
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 
-from osint_app.storage.models import Base, MentionDB, SourceTypeDB
+from osint_app.storage.models import Base, MentionDB
 from osint_app.models.schemas import Mention, SourceType, SentimentScore
 from osint_app.core.config import config
 
