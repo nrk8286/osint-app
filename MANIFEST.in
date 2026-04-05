@@ -1,0 +1,20 @@
+include README.md
+include LICENSE
+include requirements.txt
+include .env.example
+
+recursive-include . *.md
+recursive-include . *.txt
+
+exclude .git
+exclude .gitignore
+exclude .github
+exclude .env
+exclude venv
+exclude *.pyc
+exclude __pycache__
+exclude .pytest_cache
+exclude .mypy_cache
+exclude dist
+exclude build
+exclude *.egg-info
