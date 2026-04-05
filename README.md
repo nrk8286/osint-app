@@ -35,6 +35,10 @@ Please ensure you:
 - Twitter Developer Account (for Twitter API access)
 - Internet connection
 
+## Quick Start
+
+See [FULL_SETUP_GUIDE.md](FULL_SETUP_GUIDE.md) for complete setup instructions.
+
 ## Installation
 
 ### 1. Clone the Repository
@@ -63,7 +67,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Configure API Keys
+### 4. Configure API Keys (Optional)
 
 #### Twitter API Setup
 
@@ -77,6 +81,14 @@ pip install -r requirements.txt
    - Bearer Token
 
 #### Environment Configuration
+
+For detailed Twitter API setup, see [TWITTER_API_SETUP.md](TWITTER_API_SETUP.md) or run the interactive setup:
+
+```bash
+python setup_twitter_api.py
+```
+
+Or manually:
 
 1. Copy the example environment file:
    ```bash
@@ -234,12 +246,21 @@ This project is provided for educational and research purposes. Users are respon
 
 This tool is provided "as is" without warranty of any kind. The authors are not responsible for any misuse or damage caused by this tool. Always ensure your monitoring activities comply with applicable laws and regulations.
 
+## Setup Guides
+
+- **[FULL_SETUP_GUIDE.md](FULL_SETUP_GUIDE.md)** - Complete step-by-step setup for all features
+- **[TWITTER_API_SETUP.md](TWITTER_API_SETUP.md)** - Detailed Twitter API configuration
+- **[RECON_NG_SETUP.md](RECON_NG_SETUP.md)** - Recon-ng framework setup and usage
+- **[RECON_NG_QUICKSTART.md](RECON_NG_QUICKSTART.md)** - Quick start with Recon-ng
+- **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide for basic usage
+
 ## Resources
 
 - [OSINT Framework](https://osintframework.com/)
 - [Twitter API Documentation](https://developer.twitter.com/en/docs)
 - [Google Custom Search API](https://developers.google.com/custom-search)
 - [Beautiful Soup Documentation](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+- [Recon-ng Wiki](https://github.com/lanmaster53/recon-ng/wiki)
 
 ## Support
 
