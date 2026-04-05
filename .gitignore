@@ -22,6 +22,12 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*/__pycache__/
+
+# Virtual Environment
+venv/
+ENV/
+env/
 
 # Environment variables
 .env
@@ -44,6 +50,26 @@ osint_data.db
 *.swo
 *~
 
+# Environment variables
+.env
+
+# Database
+*.db
+*.sqlite
+data/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 # OS
 .DS_Store
 Thumbs.db
