@@ -65,7 +65,7 @@ class RedditSource(BaseSource):
         mentions = []
 
         try:
-            # Run Reddit search in executor
+            loop = asyncio.get_running_loop()
             loop = asyncio.get_event_loop()
             submissions = await loop.run_in_executor(
                 None, lambda: list(self.client.subreddit("all").search(keyword, limit=max_results))
