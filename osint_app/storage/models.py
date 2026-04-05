@@ -8,11 +8,13 @@ import enum
 
 class Base(DeclarativeBase):
     """Base class for all database models."""
+
     pass
 
 
 class SourceTypeDB(str, enum.Enum):
     """Source types for database."""
+
     GOOGLE = "google"
     TWITTER = "twitter"
     REDDIT = "reddit"
@@ -23,6 +25,7 @@ class SourceTypeDB(str, enum.Enum):
 
 class SentimentDB(str, enum.Enum):
     """Sentiment types for database."""
+
     POSITIVE = "positive"
     NEGATIVE = "negative"
     NEUTRAL = "neutral"

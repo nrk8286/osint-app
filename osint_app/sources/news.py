@@ -6,6 +6,7 @@ import asyncio
 
 try:
     import aiohttp
+
     NEWS_HTTP_AVAILABLE = True
 except ImportError:
     NEWS_HTTP_AVAILABLE = False
@@ -46,11 +47,11 @@ class NewsAPISource(BaseSource):
 
         try:
             params = {
-                'q': keyword,
-                'apiKey': self.api_key,
-                'pageSize': min(max_results, 100),
-                'sortBy': 'publishedAt',
-                'language': 'en'
+                "q": keyword,
+                "apiKey": self.api_key,
+                "pageSize": min(max_results, 100),
+                "sortBy": "publishedAt",
+                "language": "en",
             }
 
             async with aiohttp.ClientSession() as session:
@@ -58,21 +59,27 @@ class NewsAPISource(BaseSource):
                     if response.status == 200:
                         data = await response.json()
 
-                        for article in data.get('articles', []):
+                        for article in data.get("articles", []):
                             mention = Mention(
                                 source=SourceType.NEWS,
                                 keyword=keyword,
-                                url=article.get('url', ''),
-                                title=article.get('title', ''),
-                                content=article.get('description', '') + '\n' + article.get('content', ''),
-                                timestamp=datetime.fromisoformat(
-                                    article.get('publishedAt', '').replace('Z', '+00:00')
-                                ) if article.get('publishedAt') else datetime.now(),
-                                author=article.get('author'),
+                                url=article.get("url", ""),
+                                title=article.get("title", ""),
+                                content=article.get("description", "")
+                                + "\n"
+                                + article.get("content", ""),
+                                timestamp=(
+                                    datetime.fromisoformat(
+                                        article.get("publishedAt", "").replace("Z", "+00:00")
+                                    )
+                                    if article.get("publishedAt")
+                                    else datetime.now()
+                                ),
+                                author=article.get("author"),
                                 metadata={
-                                    'source_name': article.get('source', {}).get('name'),
-                                    'image_url': article.get('urlToImage')
-                                }
+                                    "source_name": article.get("source", {}).get("name"),
+                                    "image_url": article.get("urlToImage"),
+                                },
                             )
                             mentions.append(mention)
                     else:

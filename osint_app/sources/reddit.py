@@ -6,6 +6,7 @@ import asyncio
 
 try:
     import praw
+
     REDDIT_AVAILABLE = True
 except ImportError:
     REDDIT_AVAILABLE = False
@@ -35,7 +36,7 @@ class RedditSource(BaseSource):
                 self.client = praw.Reddit(
                     client_id=config.reddit.client_id,
                     client_secret=config.reddit.client_secret,
-                    user_agent=config.reddit.user_agent
+                    user_agent=config.reddit.user_agent,
                 )
                 self.enabled = True
             else:
@@ -67,8 +68,7 @@ class RedditSource(BaseSource):
             # Run Reddit search in executor
             loop = asyncio.get_event_loop()
             submissions = await loop.run_in_executor(
-                None,
-                lambda: list(self.client.subreddit('all').search(keyword, limit=max_results))
+                None, lambda: list(self.client.subreddit("all").search(keyword, limit=max_results))
             )
 
             for submission in submissions:
@@ -81,11 +81,11 @@ class RedditSource(BaseSource):
                     timestamp=datetime.fromtimestamp(submission.created_utc),
                     author=str(submission.author) if submission.author else None,
                     metadata={
-                        'subreddit': str(submission.subreddit),
-                        'score': submission.score,
-                        'num_comments': submission.num_comments,
-                        'upvote_ratio': submission.upvote_ratio
-                    }
+                        "subreddit": str(submission.subreddit),
+                        "score": submission.score,
+                        "num_comments": submission.num_comments,
+                        "upvote_ratio": submission.upvote_ratio,
+                    },
                 )
                 mentions.append(mention)
 

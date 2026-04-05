@@ -15,7 +15,7 @@ from osint_app.core.config import config
 app = FastAPI(
     title="OSINT Monitoring Platform API",
     description="Production-ready OSINT monitoring and data collection API",
-    version="2.0.0"
+    version="2.0.0",
 )
 
 # Add CORS middleware
@@ -43,33 +43,27 @@ async def root():
             "search": "/api/search",
             "mentions": "/api/mentions",
             "stats": "/api/stats",
-            "health": "/health"
-        }
+            "health": "/health",
+        },
     }
 
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    sources_status = {
-        name: source.is_available()
-        for name, source in monitor.sources.items()
-    }
+    sources_status = {name: source.is_available() for name, source in monitor.sources.items()}
 
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "sources": sources_status,
         "database": bool(db),
-        "sentiment_analysis": bool(monitor.sentiment_analyzer)
+        "sentiment_analysis": bool(monitor.sentiment_analyzer),
     }
 
 
 @app.post("/api/search", response_model=List[Mention])
-async def search(
-    query: SearchQuery,
-    background_tasks: BackgroundTasks
-):
+async def search(query: SearchQuery, background_tasks: BackgroundTasks):
     """Search for mentions across all sources.
 
     Args:
@@ -85,7 +79,7 @@ async def search(
             twitter_results=query.twitter_results if query.enable_twitter else 0,
             reddit_results=query.reddit_results if query.enable_reddit else 0,
             news_results=query.news_results if query.enable_news else 0,
-            enable_sentiment=query.enable_sentiment
+            enable_sentiment=query.enable_sentiment,
         )
 
         return mentions
@@ -101,7 +95,7 @@ async def get_mentions(
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     limit: int = Query(100, ge=1, le=1000),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
 ):
     """Retrieve mentions from database with filtering.
 
@@ -123,7 +117,7 @@ async def get_mentions(
             start_date=start_date,
             end_date=end_date,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
         return mentions
 
@@ -157,11 +151,7 @@ async def get_sources():
         Dictionary of source statuses
     """
     return {
-        name: {
-            "available": source.is_available(),
-            "name": source.name,
-            "enabled": source.enabled
-        }
+        name: {"available": source.is_available(), "name": source.name, "enabled": source.enabled}
         for name, source in monitor.sources.items()
     }
 
@@ -203,7 +193,7 @@ async def analyze_sentiment(text: str):
         return {
             "text": text[:100] + "..." if len(text) > 100 else text,
             "sentiment": sentiment.value if sentiment else None,
-            "confidence": confidence
+            "confidence": confidence,
         }
 
     except Exception as e:
@@ -213,9 +203,4 @@ async def analyze_sentiment(text: str):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        app,
-        host=config.api_host,
-        port=config.api_port,
-        workers=config.api_workers
-    )
+    uvicorn.run(app, host=config.api_host, port=config.api_port, workers=config.api_workers)

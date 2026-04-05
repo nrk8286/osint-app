@@ -9,10 +9,7 @@ class TwitterConfig(BaseSettings):
     """Twitter API configuration."""
 
     model_config = SettingsConfigDict(
-        env_prefix='TWITTER_',
-        env_file='.env',
-        env_file_encoding='utf-8',
-        extra='ignore'
+        env_prefix="TWITTER_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
     api_key: Optional[str] = None
@@ -31,10 +28,7 @@ class RedditConfig(BaseSettings):
     """Reddit API configuration."""
 
     model_config = SettingsConfigDict(
-        env_prefix='REDDIT_',
-        env_file='.env',
-        env_file_encoding='utf-8',
-        extra='ignore'
+        env_prefix="REDDIT_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
     client_id: Optional[str] = None
@@ -51,10 +45,7 @@ class NewsAPIConfig(BaseSettings):
     """News API configuration."""
 
     model_config = SettingsConfigDict(
-        env_prefix='NEWS_API_',
-        env_file='.env',
-        env_file_encoding='utf-8',
-        extra='ignore'
+        env_prefix="NEWS_API_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
     key: Optional[str] = None
@@ -69,10 +60,7 @@ class DatabaseConfig(BaseSettings):
     """Database configuration."""
 
     model_config = SettingsConfigDict(
-        env_prefix='DB_',
-        env_file='.env',
-        env_file_encoding='utf-8',
-        extra='ignore'
+        env_prefix="DB_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
     url: str = "sqlite:///osint_data.db"
@@ -85,10 +73,7 @@ class RedisConfig(BaseSettings):
     """Redis cache configuration."""
 
     model_config = SettingsConfigDict(
-        env_prefix='REDIS_',
-        env_file='.env',
-        env_file_encoding='utf-8',
-        extra='ignore'
+        env_prefix="REDIS_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
     host: str = "localhost"
@@ -101,11 +86,7 @@ class RedisConfig(BaseSettings):
 class AppConfig(BaseSettings):
     """Main application configuration."""
 
-    model_config = SettingsConfigDict(
-        env_file='.env',
-        env_file_encoding='utf-8',
-        extra='ignore'
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # App settings
     app_name: str = "OSINT Monitoring Platform"

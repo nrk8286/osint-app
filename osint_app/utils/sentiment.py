@@ -5,6 +5,7 @@ import logging
 
 try:
     from transformers import pipeline
+
     TRANSFORMERS_AVAILABLE = True
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
@@ -53,15 +54,15 @@ class SentimentAnalyzer:
             text = text[:512]
 
             result = self.pipeline(text)[0]
-            label = result['label'].upper()
-            score = result['score']
+            label = result["label"].upper()
+            score = result["score"]
 
             # Map model output to our sentiment categories
             sentiment_map = {
-                'POSITIVE': SentimentScore.POSITIVE,
-                'NEGATIVE': SentimentScore.NEGATIVE,
-                'NEUTRAL': SentimentScore.NEUTRAL,
-                'MIXED': SentimentScore.MIXED
+                "POSITIVE": SentimentScore.POSITIVE,
+                "NEGATIVE": SentimentScore.NEGATIVE,
+                "NEUTRAL": SentimentScore.NEUTRAL,
+                "MIXED": SentimentScore.MIXED,
             }
 
             sentiment = sentiment_map.get(label, SentimentScore.NEUTRAL)
@@ -100,12 +101,32 @@ class SimpleSentimentAnalyzer:
     def __init__(self):
         """Initialize simple sentiment analyzer."""
         self.positive_words = {
-            'good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic',
-            'love', 'best', 'awesome', 'happy', 'perfect', 'beautiful'
+            "good",
+            "great",
+            "excellent",
+            "amazing",
+            "wonderful",
+            "fantastic",
+            "love",
+            "best",
+            "awesome",
+            "happy",
+            "perfect",
+            "beautiful",
         }
         self.negative_words = {
-            'bad', 'terrible', 'awful', 'horrible', 'worst', 'hate',
-            'poor', 'disappointing', 'sad', 'angry', 'annoying', 'useless'
+            "bad",
+            "terrible",
+            "awful",
+            "horrible",
+            "worst",
+            "hate",
+            "poor",
+            "disappointing",
+            "sad",
+            "angry",
+            "annoying",
+            "useless",
         }
 
     def analyze(self, text: str) -> Tuple[Optional[SentimentScore], Optional[float]]:

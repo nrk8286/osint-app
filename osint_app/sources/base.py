@@ -41,10 +41,7 @@ class BaseSource(ABC):
         return self.enabled
 
     async def search_with_retry(
-        self,
-        keyword: str,
-        max_results: int = 10,
-        max_retries: int = 3
+        self, keyword: str, max_results: int = 10, max_retries: int = 3
     ) -> List[Mention]:
         """Search with retry logic.
 
@@ -63,5 +60,5 @@ class BaseSource(ABC):
                 if attempt == max_retries - 1:
                     print(f"Error in {self.name} after {max_retries} attempts: {e}")
                     return []
-                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                await asyncio.sleep(2**attempt)  # Exponential backoff
         return []

@@ -6,6 +6,7 @@ import asyncio
 
 try:
     import tweepy
+
     TWITTER_AVAILABLE = True
 except ImportError:
     TWITTER_AVAILABLE = False
@@ -67,8 +68,8 @@ class TwitterSource(BaseSource):
                 lambda: self.client.search_recent_tweets(
                     query=keyword,
                     max_results=min(max_results, 100),
-                    tweet_fields=['created_at', 'author_id', 'public_metrics']
-                )
+                    tweet_fields=["created_at", "author_id", "public_metrics"],
+                ),
             )
 
             if response.data:
@@ -76,15 +77,19 @@ class TwitterSource(BaseSource):
                     mention = Mention(
                         source=SourceType.TWITTER,
                         keyword=keyword,
-                        url=f'https://twitter.com/user/status/{tweet.id}',
-                        title=f'Tweet by user {tweet.author_id}',
+                        url=f"https://twitter.com/user/status/{tweet.id}",
+                        title=f"Tweet by user {tweet.author_id}",
                         content=tweet.text,
-                        timestamp=tweet.created_at if hasattr(tweet, 'created_at') else datetime.now(),
+                        timestamp=(
+                            tweet.created_at if hasattr(tweet, "created_at") else datetime.now()
+                        ),
                         author=str(tweet.author_id),
                         metadata={
-                            'tweet_id': str(tweet.id),
-                            'metrics': tweet.public_metrics if hasattr(tweet, 'public_metrics') else {}
-                        }
+                            "tweet_id": str(tweet.id),
+                            "metrics": (
+                                tweet.public_metrics if hasattr(tweet, "public_metrics") else {}
+                            ),
+                        },
                     )
                     mentions.append(mention)
 

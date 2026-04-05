@@ -18,11 +18,7 @@ from osint_app.core.config import config
 class OSINTMonitor:
     """Main class for OSINT monitoring with async support."""
 
-    def __init__(
-        self,
-        use_database: bool = True,
-        enable_sentiment: bool = True
-    ):
+    def __init__(self, use_database: bool = True, enable_sentiment: bool = True):
         """Initialize the OSINT monitor.
 
         Args:
@@ -31,10 +27,10 @@ class OSINTMonitor:
         """
         # Initialize sources
         self.sources = {
-            'google': GoogleSource(),
-            'twitter': TwitterSource(),
-            'reddit': RedditSource(),
-            'news': NewsAPISource()
+            "google": GoogleSource(),
+            "twitter": TwitterSource(),
+            "reddit": RedditSource(),
+            "news": NewsAPISource(),
         }
 
         # Initialize storage
@@ -71,7 +67,7 @@ class OSINTMonitor:
         google_results: int = 10,
         twitter_results: int = 10,
         reddit_results: int = 10,
-        news_results: int = 10
+        news_results: int = 10,
     ) -> List[Mention]:
         """Search all available sources concurrently.
 
@@ -87,17 +83,17 @@ class OSINTMonitor:
         """
         tasks = []
 
-        if self.sources['google'].is_available():
-            tasks.append(self.sources['google'].search(keyword, google_results))
+        if self.sources["google"].is_available():
+            tasks.append(self.sources["google"].search(keyword, google_results))
 
-        if self.sources['twitter'].is_available():
-            tasks.append(self.sources['twitter'].search(keyword, twitter_results))
+        if self.sources["twitter"].is_available():
+            tasks.append(self.sources["twitter"].search(keyword, twitter_results))
 
-        if self.sources['reddit'].is_available():
-            tasks.append(self.sources['reddit'].search(keyword, reddit_results))
+        if self.sources["reddit"].is_available():
+            tasks.append(self.sources["reddit"].search(keyword, reddit_results))
 
-        if self.sources['news'].is_available():
-            tasks.append(self.sources['news'].search(keyword, news_results))
+        if self.sources["news"].is_available():
+            tasks.append(self.sources["news"].search(keyword, news_results))
 
         # Execute all searches concurrently
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -119,7 +115,7 @@ class OSINTMonitor:
         twitter_results: int = 10,
         reddit_results: int = 10,
         news_results: int = 10,
-        enable_sentiment: bool = True
+        enable_sentiment: bool = True,
     ) -> List[Mention]:
         """Collect mentions from all sources with sentiment analysis.
 
@@ -144,7 +140,7 @@ class OSINTMonitor:
             google_results=google_results,
             twitter_results=twitter_results,
             reddit_results=reddit_results,
-            news_results=news_results
+            news_results=news_results,
         )
 
         print(f"\nCollected {len(mentions)} total mentions")
@@ -194,7 +190,9 @@ class OSINTMonitor:
             by_sentiment = {}
             for mention in mentions:
                 if mention.sentiment:
-                    by_sentiment[mention.sentiment.value] = by_sentiment.get(mention.sentiment.value, 0) + 1
+                    by_sentiment[mention.sentiment.value] = (
+                        by_sentiment.get(mention.sentiment.value, 0) + 1
+                    )
 
             for sentiment, count in by_sentiment.items():
                 print(f"  {sentiment.capitalize():12} : {count}")
@@ -212,23 +210,23 @@ class OSINTMonitor:
             return
 
         if filename is None:
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f'mentions_{timestamp}.csv'
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"mentions_{timestamp}.csv"
 
         try:
             # Convert to dict for DataFrame
             data = [
                 {
-                    'source': m.source.value,
-                    'keyword': m.keyword,
-                    'url': m.url,
-                    'title': m.title,
-                    'content': m.content,
-                    'timestamp': m.timestamp.isoformat(),
-                    'author': m.author,
-                    'sentiment': m.sentiment.value if m.sentiment else None,
-                    'sentiment_confidence': m.sentiment_confidence,
-                    'language': m.language
+                    "source": m.source.value,
+                    "keyword": m.keyword,
+                    "url": m.url,
+                    "title": m.title,
+                    "content": m.content,
+                    "timestamp": m.timestamp.isoformat(),
+                    "author": m.author,
+                    "sentiment": m.sentiment.value if m.sentiment else None,
+                    "sentiment_confidence": m.sentiment_confidence,
+                    "language": m.language,
                 }
                 for m in self.mentions
             ]
@@ -251,15 +249,15 @@ class OSINTMonitor:
             return
 
         if filename is None:
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f'mentions_{timestamp}.json'
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"mentions_{timestamp}.json"
 
         try:
             import json
 
-            data = [m.model_dump(mode='json') for m in self.mentions]
+            data = [m.model_dump(mode="json") for m in self.mentions]
 
-            with open(filename, 'w', encoding='utf-8') as f:
+            with open(filename, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
 
             print(f"\n✓ Mentions saved to: {filename}")
@@ -294,7 +292,7 @@ def collect_mentions_sync(
     twitter_results: int = 10,
     reddit_results: int = 10,
     news_results: int = 10,
-    enable_sentiment: bool = True
+    enable_sentiment: bool = True,
 ) -> List[Mention]:
     """Synchronous wrapper for collect_mentions.
 
@@ -310,11 +308,13 @@ def collect_mentions_sync(
         List of mentions
     """
     monitor = OSINTMonitor()
-    return asyncio.run(monitor.collect_mentions(
-        keyword=keyword,
-        google_results=google_results,
-        twitter_results=twitter_results,
-        reddit_results=reddit_results,
-        news_results=news_results,
-        enable_sentiment=enable_sentiment
-    ))
+    return asyncio.run(
+        monitor.collect_mentions(
+            keyword=keyword,
+            google_results=google_results,
+            twitter_results=twitter_results,
+            reddit_results=reddit_results,
+            news_results=news_results,
+            enable_sentiment=enable_sentiment,
+        )
+    )

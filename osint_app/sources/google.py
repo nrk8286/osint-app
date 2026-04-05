@@ -6,6 +6,7 @@ from typing import List
 
 try:
     from googlesearch import search as google_search
+
     GOOGLE_AVAILABLE = True
 except ImportError:
     GOOGLE_AVAILABLE = False
@@ -46,7 +47,7 @@ class GoogleSource(BaseSource):
             loop = asyncio.get_event_loop()
             urls = await loop.run_in_executor(
                 None,
-                lambda: list(google_search(keyword, num_results=max_results, sleep_interval=2))
+                lambda: list(google_search(keyword, num_results=max_results, sleep_interval=2)),
             )
 
             for url in urls:
@@ -56,7 +57,7 @@ class GoogleSource(BaseSource):
                     url=url,
                     title=url,
                     content="",
-                    timestamp=datetime.now()
+                    timestamp=datetime.now(),
                 )
                 mentions.append(mention)
 
