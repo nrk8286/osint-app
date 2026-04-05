@@ -29,6 +29,14 @@ wheels/
 # CSV output files
 *.csv
 
+# JSON output files
+mentions_*.json
+
+# Database files
+*.db
+*.db-journal
+osint_data.db
+
 # IDE
 .vscode/
 .idea/
@@ -39,3 +47,23 @@ wheels/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+*.cover
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Docker
+data/
+*.log
+
+# Model cache (Hugging Face)
+models/
+.cache/
