@@ -61,7 +61,7 @@ class TwitterSource(BaseSource):
         mentions = []
 
         try:
-            # Run Twitter API call in executor
+            loop = asyncio.get_running_loop()
             loop = asyncio.get_event_loop()
             response = await loop.run_in_executor(
                 None,
