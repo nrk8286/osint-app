@@ -4,3 +4,5 @@ requests>=2.31.0
 beautifulsoup4>=4.12.0
 pandas>=2.0.0
 python-dotenv>=1.0.0
+# Recon-ng is a standalone tool - install separately
+# See RECON_NG_SETUP.md for installation instructions

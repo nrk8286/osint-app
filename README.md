@@ -23,6 +23,7 @@ Please ensure you:
 - 🔍 **Google Search Integration**: Collect keyword mentions from Google search results
 - 🐦 **Twitter API Integration**: Monitor tweets containing specific keywords
 - 🌐 **Web Scraping**: Scrape custom websites for keyword mentions
+- 🔎 **Recon-ng Integration**: Advanced OSINT reconnaissance framework for domain enumeration and email harvesting
 - 💾 **CSV Export**: Save all collected mentions to CSV for analysis
 - 🔒 **Secure Configuration**: API keys managed via environment variables
 - ⚡ **Rate Limiting**: Built-in delays to respect server resources
@@ -133,6 +134,39 @@ scrape_urls = [
     # Add more URLs here
 ]
 ```
+
+### Using Recon-ng for Advanced Reconnaissance
+
+Recon-ng provides powerful domain enumeration and email harvesting capabilities.
+
+**Quick Start:**
+
+1. Install Recon-ng:
+   ```bash
+   git clone https://github.com/lanmaster53/recon-ng.git
+   cd recon-ng
+   pip install -r requirements.txt
+   sudo ln -s $(pwd)/recon-ng /usr/local/bin/recon-ng
+   ```
+
+2. Use with OSINT Monitor:
+   ```python
+   from osint_monitor import OSINTMonitor
+
+   monitor = OSINTMonitor()
+   
+   # Domain reconnaissance
+   results = monitor.recon_domain("example.com")
+   
+   # Email harvesting
+   emails = monitor.harvest_emails("example.com")
+   
+   # Collect with Recon-ng enabled
+   mentions = monitor.collect_mentions("example.com", use_recon_ng=True)
+   monitor.save_to_csv()
+   ```
+
+For detailed setup and configuration, see [RECON_NG_SETUP.md](RECON_NG_SETUP.md) and [RECON_NG_QUICKSTART.md](RECON_NG_QUICKSTART.md)
 
 ## Output
 
