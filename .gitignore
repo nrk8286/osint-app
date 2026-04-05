@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
+venv/
+ENV/
 build/
 develop-eggs/
 dist/
@@ -25,6 +28,12 @@ wheels/
 venv/
 ENV/
 env/
+
+# Environment variables
+.env
+
+# CSV output files
+*.csv
 
 # IDE
 .vscode/
@@ -53,3 +62,6 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+# OS
+.DS_Store
+Thumbs.db
