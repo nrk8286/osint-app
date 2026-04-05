@@ -45,7 +45,7 @@ class MentionDB(Base):
     content: Mapped[str] = mapped_column(Text, default="")
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, index=True)
     author: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    sentiment: Mapped[str | None] = mapped_column(SQLEnum(SentimentDB), nullable=True)
+    extra_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
     sentiment_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     language: Mapped[str | None] = mapped_column(String(10), nullable=True)
     metadata: Mapped[dict] = mapped_column(JSON, default=dict)
