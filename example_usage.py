@@ -1,67 +1,87 @@
 #!/usr/bin/env python3
 """
-Example usage of the OSINT Monitor
-This demonstrates how to use the OSINTMonitor class programmatically.
+Example usage of the OSINT Monitor v2.0
+Demonstrates programmatic usage of OSINTMonitor and NetworkRecon.
 """
 
-from osint_monitor import OSINTMonitor
+import asyncio
+from osint_app.core.monitor import OSINTMonitor, collect_mentions_sync
+from osint_app.recon.network import NetworkRecon
 
-def main():
-    """Example of programmatic usage."""
-    
-    # Initialize the monitor
-    monitor = OSINTMonitor()
-    
-    # Example 1: Search for a single keyword
-    print("\n=== Example 1: Single Keyword Search ===")
-    keyword = "cybersecurity"
-    mentions = monitor.collect_mentions(
-        keyword=keyword,
-        google_results=5,      # Get 5 Google results
-        twitter_results=5,     # Get 5 tweets
-        scrape_urls=[
-            # Add URLs to scrape (optional)
-            # 'https://example.com',
-        ]
+
+async def main():
+    """Async examples of programmatic usage."""
+
+    monitor = OSINTMonitor(use_database=False, enable_sentiment=False)
+
+    # ── Example 1: Search all sources ────────────────────────────────
+    print("\n=== Example 1: Full Multi-Source Search ===")
+    mentions = await monitor.collect_mentions(
+        keyword="cybersecurity",
+        google_results=5,
+        twitter_results=5,
+        reddit_results=5,
+        news_results=5,
+        github_results=5,
     )
-    
-    # Save results
+
     if mentions:
-        monitor.save_to_csv(f"{keyword}_mentions.csv")
-    
-    # Example 2: Monitor multiple keywords
-    print("\n\n=== Example 2: Multiple Keywords ===")
-    keywords = ["OSINT", "threat intelligence", "data breach"]
-    
-    all_mentions = []
-    for kw in keywords:
-        print(f"\nSearching for: {kw}")
-        mentions = monitor.collect_mentions(
-            keyword=kw,
-            google_results=3,
-            twitter_results=3
-        )
-        all_mentions.extend(mentions)
-    
-    # Save all mentions to a single file
-    if all_mentions:
-        monitor.mentions = all_mentions
-        monitor.save_to_csv("multi_keyword_mentions.csv")
-    
-    # Example 3: Custom web scraping
-    print("\n\n=== Example 3: Custom Web Scraping ===")
-    custom_urls = [
-        'https://news.ycombinator.com',
-        'https://www.reddit.com/r/programming',
-    ]
-    
-    web_mentions = monitor.scrape_websites(
-        keyword="Python",
-        urls=custom_urls
+        monitor.save_to_csv("cybersecurity_mentions.csv")
+        monitor.save_to_json("cybersecurity_mentions.json")
+
+    # ── Example 2: Search specific sources only ──────────────────────
+    print("\n=== Example 2: Targeted Source Search ===")
+    await monitor.collect_mentions(
+        keyword="machine learning",
+        sources=["reddit", "github"],
+        reddit_results=10,
+        github_results=10,
     )
-    
-    if web_mentions:
-        print(f"Found {len(web_mentions)} mentions in custom URLs")
+
+    # ── Example 3: Multiple keywords ─────────────────────────────────
+    print("\n=== Example 3: Multiple Keywords ===")
+    for kw in ["OSINT", "threat intelligence", "data breach"]:
+        await monitor.collect_mentions(
+            keyword=kw,
+            sources=["google", "reddit"],
+            google_results=3,
+            reddit_results=3,
+        )
+
+    if monitor.mentions:
+        monitor.save_to_csv("multi_keyword_mentions.csv")
+        monitor.save_to_json("multi_keyword_mentions.json")
+
+    # ── Example 4: Domain reconnaissance ─────────────────────────────
+    print("\n=== Example 4: Domain Reconnaissance ===")
+    recon = NetworkRecon()
+
+    dns = recon.dns_lookup("example.com")
+    print(f"DNS records: {dns.data}")
+
+    ip = recon.ip_info("example.com")
+    print(f"IP info: {ip.data}")
+
+    headers = recon.check_headers("https://example.com")
+    print(f"Missing security headers: {headers.data.get('missing_security_headers', [])}")
+
+    # ── Example 5: Summary report and filtering ──────────────────────
+    print("\n=== Example 5: Summary & Filtering ===")
+    monitor.summary_report()
+
+    reddit_only = monitor.filter_mentions(source="reddit")
+    print(f"Reddit-only results: {len(reddit_only)}")
+
+    high_relevance = monitor.filter_mentions(min_relevance=0.5)
+    print(f"High relevance results: {len(high_relevance)}")
+
+
+def sync_example():
+    """Synchronous usage example."""
+    print("\n=== Sync Example ===")
+    mentions = collect_mentions_sync(keyword="python", google_results=3, github_results=3)
+    print(f"Found {len(mentions)} mentions synchronously")
+
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

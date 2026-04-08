@@ -19,6 +19,7 @@ class SourceTypeDB(str, enum.Enum):
     TWITTER = "twitter"
     REDDIT = "reddit"
     NEWS = "news"
+    GITHUB = "github"
     WEB = "web"
     RSS = "rss"
 
@@ -38,17 +39,16 @@ class MentionDB(Base):
     __tablename__ = "mentions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    source: Mapped[str] = mapped_column(SQLEnum(SourceTypeDB), nullable=False, index=True)
+    source: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     keyword: Mapped[str] = mapped_column(String(500), nullable=False, index=True)
     url: Mapped[str] = mapped_column(Text, nullable=False)
     title: Mapped[str] = mapped_column(Text, nullable=False)
     content: Mapped[str] = mapped_column(Text, default="")
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, index=True)
     author: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    extra_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
     sentiment_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     language: Mapped[str | None] = mapped_column(String(10), nullable=True)
-    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+    extra_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     def __repr__(self) -> str:
