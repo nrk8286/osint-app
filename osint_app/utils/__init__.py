@@ -40,7 +40,7 @@ def clean_text(text: str) -> str:
         Cleaned text
     """
     # Remove URLs
-    text = re.sub(r'http\S+|www.\S+', '', text)
+    text = re.sub(r'http\S+|www\.\S+', '', text)
     # Remove extra whitespace
     text = ' '.join(text.split())
     return text.strip()
