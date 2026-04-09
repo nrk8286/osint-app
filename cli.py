@@ -238,7 +238,7 @@ Examples:
         
         # Display summary
         if not args.no_summary:
-            display_summary(app)
+            display_summary(app, mentions=mentions)
         
         # Export if requested
         if args.export:
