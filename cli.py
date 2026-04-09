@@ -4,7 +4,6 @@
 import argparse
 import json
 import sys
-from datetime import datetime
 from typing import List
 from osint_app.app import OSINTApp
 from osint_app.models import Mention
