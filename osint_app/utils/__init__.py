@@ -1,7 +1,6 @@
 """Utility functions for OSINT app."""
 
 from textblob import TextBlob
-from typing import Optional
 import re
 
 
