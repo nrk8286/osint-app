@@ -32,7 +32,7 @@ class TwitterMonitor(BaseMonitor):
     
     def is_available(self) -> bool:
         """Check if Twitter monitor is available."""
-        return self.api_key is not None and self.api_secret is not None
+        return bool(self.api_key) and bool(self.api_secret)
     
     def search(self, query: SearchQuery) -> List[Mention]:
         """

@@ -1,21 +1,29 @@
 """Main OSINT App orchestrator."""
 
+import logging
 from typing import List, Dict, Any, Optional
-from datetime import datetime
 from osint_app.models import Mention, SearchQuery
 from osint_app.monitors import get_monitor
-from osint_app.utils import analyze_sentiment
+
+logger = logging.getLogger(__name__)
+
+
+DEFAULT_PLATFORMS = ['twitter', 'reddit', 'web']
 
 
 class OSINTApp:
     """Main OSINT application for monitoring social media mentions."""
-    
+
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
         Initialize OSINT App.
-        
+
         Args:
-            config: Optional configuration dictionary
+            config: Optional configuration dictionary. Supported keys:
+                - ``default_platforms`` (list[str]): platforms to use when none are specified.
+                - ``max_results_default`` (int): default max-results value.
+                - ``twitter`` (dict): kwargs forwarded to TwitterMonitor.
+                - ``reddit`` (dict): kwargs forwarded to RedditMonitor.
         """
         self.config = config or {}
         self.monitors = {}
@@ -24,29 +32,32 @@ class OSINTApp:
     def add_monitor(self, platform: str, **kwargs):
         """
         Add a monitor for a specific platform.
-        
+
         Args:
             platform: Platform name
             **kwargs: Additional arguments for monitor
         """
-        monitor = get_monitor(platform, **kwargs)
+        # Merge any platform-specific config from self.config
+        platform_config = self.config.get(platform.lower(), {})
+        merged_kwargs = {**platform_config, **kwargs}
+        monitor = get_monitor(platform, **merged_kwargs)
         self.monitors[platform.lower()] = monitor
-    
-    def search(self, keywords: List[str], platforms: List[str] = None, 
+
+    def search(self, keywords: List[str], platforms: List[str] = None,
                max_results: int = 100) -> List[Mention]:
         """
         Search for mentions across platforms.
-        
+
         Args:
             keywords: List of keywords to search
-            platforms: List of platforms to search (default: all)
+            platforms: List of platforms to search (default: all supported platforms)
             max_results: Maximum results per platform
-            
+
         Returns:
             List of all mentions found
         """
         if platforms is None:
-            platforms = list(self.monitors.keys())
+            platforms = self.config.get('default_platforms', DEFAULT_PLATFORMS)
         
         all_mentions = []
         
@@ -66,7 +77,7 @@ class OSINTApp:
                 mentions = monitor.search(query)
                 all_mentions.extend(mentions)
             except Exception as e:
-                print(f"Error searching {platform}: {e}")
+                logger.warning("Error searching %s: %s", platform, e, exc_info=True)
         
         self.results = all_mentions
         return all_mentions

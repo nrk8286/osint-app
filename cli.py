@@ -9,6 +9,12 @@ from osint_app.app import OSINTApp
 from osint_app.models import Mention
 
 try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+try:
     from colorama import init, Fore, Style
     init(autoreset=True)
     COLORS_AVAILABLE = True
@@ -106,13 +112,13 @@ def display_mentions(mentions: List[Mention]):
         print()
 
 
-def display_summary(app: OSINTApp):
-    """Display summary statistics."""
+def display_summary(app: OSINTApp, mentions: List[Mention] = None):
+    """Display summary statistics for the given mentions."""
     print_header("Summary Statistics")
-    
-    sentiment = app.get_sentiment_summary()
-    platforms = app.get_platform_summary()
-    engagement = app.get_engagement_summary()
+
+    sentiment = app.get_sentiment_summary(mentions)
+    platforms = app.get_platform_summary(mentions)
+    engagement = app.get_engagement_summary(mentions)
     
     # Sentiment Summary
     print_info("Sentiment Distribution:")
