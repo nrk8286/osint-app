@@ -2,7 +2,6 @@
 """Example usage of OSINT App."""
 
 from osint_app.app import OSINTApp
-from osint_app.models import SearchQuery
 
 
 def main():
