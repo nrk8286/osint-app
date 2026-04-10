@@ -2,7 +2,7 @@
 """
 OSINT App - Main Entry Point
 """
-from osint_app.cli import cli
+from osint_app.cli import main
 
 if __name__ == '__main__':
-    cli()
+    main()
