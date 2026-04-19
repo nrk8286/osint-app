@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Main OSINT application
+  osint-app:
+    build: .
+    container_name: osint-monitoring
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env
+    environment:
+      - DB_URL=sqlite:////app/data/osint_data.db
+      - REDIS_HOST=redis
+      - REDIS_ENABLED=true
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - osint-network
+
+  # Redis cache (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: osint-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - osint-network
+
+  # PostgreSQL database (optional, alternative to SQLite)
+  postgres:
+    image: postgres:16-alpine
+    container_name: osint-postgres
+    environment:
+      POSTGRES_DB: osint_db
+      POSTGRES_USER: osint_user
+      POSTGRES_PASSWORD: osint_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - osint-network
+    profiles:
+      - postgres
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  osint-network:
+    driver: bridge
