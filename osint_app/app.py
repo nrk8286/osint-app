@@ -154,7 +154,7 @@ class OSINTApp:
         if mentions is None:
             mentions = self.results
 
-        total_engagement: Dict[str, int] = {"total": 0}
+        total_engagement: Dict[str, int] = {"likes": 0, "shares": 0, "comments": 0, "total": 0}
 
         for mention in mentions:
             if mention.engagement is not None:

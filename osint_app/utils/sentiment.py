@@ -53,7 +53,7 @@ class SentimentAnalyzer:
             # Truncate text to model's max length (512 tokens for BERT-based models)
             text = text[:512]
 
-            # self.pipeline is guaranteed non-None by is_available() check above
+            # The is_available() check at the top of this method guarantees pipeline is not None
             assert self.pipeline is not None
             result = self.pipeline(text)[0]
             label = result["label"].upper()

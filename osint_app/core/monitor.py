@@ -261,7 +261,7 @@ class OSINTMonitor:
         for kw, count in keywords.most_common(5):
             print(f"    {kw:<25} {count:>4}")
 
-        engaged = [m for m in self.mentions if m.engagement is not None]
+        engaged = [m for m in self.mentions if m.engagement]
         if engaged:
             total_eng = sum(m.engagement or 0 for m in engaged)
             top = sorted(engaged, key=lambda m: m.engagement or 0, reverse=True)[:3]
