@@ -6,6 +6,7 @@ For production use, integrate with real search APIs or web scraping libraries.
 
 import time
 from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from .base import BaseCollector
 

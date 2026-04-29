@@ -1,7 +1,7 @@
 """Sentiment analysis utilities."""
 
 import logging
-from typing import Any, Optional, Tuple, Union
+from typing import Optional, Tuple
 
 try:
     from transformers import pipeline

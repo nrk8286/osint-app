@@ -11,6 +11,7 @@ import pandas as pd
 
 from osint_app.core.config import config
 from osint_app.models.schemas import Mention
+from osint_app.models.schemas import Mention, SearchQuery, SourceType
 from osint_app.sources.github import GitHubSource
 from osint_app.sources.google import GoogleSource
 from osint_app.sources.news import NewsAPISource
@@ -70,6 +71,11 @@ class OSINTMonitor:
         print("  [+] Recon        : DNS / IP Info / HTTP Headers")
         print("  [+] Dedup        : URL-based deduplication")
         print("  [+] Relevance    : Keyword density scoring")
+            f"  [{'+'if self.sentiment_analyzer else '-'}] Sentiment    : {'Enabled' if self.sentiment_analyzer else 'Disabled'}"
+        )
+        print(f"  [+] Recon        : DNS / IP Info / HTTP Headers")
+        print(f"  [+] Dedup        : URL-based deduplication")
+        print(f"  [+] Relevance    : Keyword density scoring")
         print()
 
     async def search_all_sources(

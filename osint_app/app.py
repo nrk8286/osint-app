@@ -29,6 +29,8 @@ class OSINTApp:
         self.config = config or {}
         self.monitors: Dict[str, Any] = {}
         self.results: List[Mention] = []
+        self.monitors = {}
+        self.results = []
 
     def add_monitor(self, platform: str, **kwargs):
         """
@@ -46,6 +48,7 @@ class OSINTApp:
 
     def search(
         self, keywords: List[str], platforms: Optional[List[str]] = None, max_results: int = 100
+        self, keywords: List[str], platforms: List[str] = None, max_results: int = 100
     ) -> List[Mention]:
         """
         Search for mentions across platforms.
@@ -85,6 +88,7 @@ class OSINTApp:
         keywords: List[str],
         platforms: Optional[List[str]] = None,
         max_results: int = 100,
+        self, keywords: List[str], platforms: List[str] = None, max_results: int = 100
     ) -> List[Mention]:
         """
         Monitor multiple keywords across platforms.
@@ -100,6 +104,7 @@ class OSINTApp:
         return self.search(keywords, platforms, max_results)
 
     def get_sentiment_summary(self, mentions: Optional[List[Mention]] = None) -> Dict[str, int]:
+    def get_sentiment_summary(self, mentions: List[Mention] = None) -> Dict[str, int]:
         """
         Get sentiment summary of mentions.
 
@@ -121,6 +126,7 @@ class OSINTApp:
         return summary
 
     def get_platform_summary(self, mentions: Optional[List[Mention]] = None) -> Dict[str, int]:
+    def get_platform_summary(self, mentions: List[Mention] = None) -> Dict[str, int]:
         """
         Get summary of mentions by platform.
 
@@ -134,6 +140,7 @@ class OSINTApp:
             mentions = self.results
 
         summary: Dict[str, int] = {}
+        summary = {}
 
         for mention in mentions:
             platform = mention.platform
@@ -142,6 +149,7 @@ class OSINTApp:
         return summary
 
     def get_engagement_summary(self, mentions: Optional[List[Mention]] = None) -> Dict[str, int]:
+    def get_engagement_summary(self, mentions: List[Mention] = None) -> Dict[str, int]:
         """
         Get total engagement summary.
 
@@ -165,6 +173,18 @@ class OSINTApp:
     def filter_by_sentiment(
         self, sentiment: str, mentions: Optional[List[Mention]] = None
     ) -> List[Mention]:
+        total_engagement = {"likes": 0, "shares": 0, "comments": 0, "total": 0}
+
+        for mention in mentions:
+            if mention.engagement:
+                total_engagement["likes"] += mention.engagement.get("likes", 0)
+                total_engagement["shares"] += mention.engagement.get("shares", 0)
+                total_engagement["comments"] += mention.engagement.get("comments", 0)
+                total_engagement["total"] += mention.engagement.get("total", 0)
+
+        return total_engagement
+
+    def filter_by_sentiment(self, sentiment: str, mentions: List[Mention] = None) -> List[Mention]:
         """
         Filter mentions by sentiment.
 
@@ -183,6 +203,7 @@ class OSINTApp:
     def filter_by_platform(
         self, platform: str, mentions: Optional[List[Mention]] = None
     ) -> List[Mention]:
+    def filter_by_platform(self, platform: str, mentions: List[Mention] = None) -> List[Mention]:
         """
         Filter mentions by platform.
 
@@ -199,6 +220,7 @@ class OSINTApp:
         return [m for m in mentions if m.platform.lower() == platform.lower()]
 
     def export_results(self, mentions: Optional[List[Mention]] = None) -> List[Dict[str, Any]]:
+    def export_results(self, mentions: List[Mention] = None) -> List[Dict[str, Any]]:
         """
         Export results as list of dictionaries.
 

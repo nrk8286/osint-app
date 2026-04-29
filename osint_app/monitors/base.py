@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List
+from typing import List, Optional
 
 from osint_app.models import Mention, SearchQuery
 

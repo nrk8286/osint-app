@@ -9,6 +9,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from osint_app.core.config import config
 from osint_app.models.schemas import Mention, SourceType
+from osint_app.models.schemas import Mention, SentimentScore, SourceType
 from osint_app.storage.models import Base, MentionDB
 
 
@@ -215,6 +216,7 @@ _CompatBase = declarative_base()
 
 
 class _MentionCompat(_CompatBase):  # type: ignore[misc,valid-type]
+class _MentionCompat(_CompatBase):
     __tablename__ = "mentions"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -225,7 +227,7 @@ class _MentionCompat(_CompatBase):  # type: ignore[misc,valid-type]
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
 
-class _QueryCompat(_CompatBase):  # type: ignore[misc,valid-type]
+class _QueryCompat(_CompatBase):
     __tablename__ = "queries"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
