@@ -1,170 +1,120 @@
 """
 Unit tests for OSINT App database storage.
 """
-import unittest
 import os
+import shutil
 import tempfile
-from osint_app.storage.database import Database
+import unittest
+from datetime import datetime, timedelta
+
+from osint_app.models.schemas import Mention, SourceType
+from osint_app.storage.database import DatabaseStorage
 
 
-class TestDatabase(unittest.TestCase):
-    """Test database functionality."""
-    
+def _make_mention(keyword: str = "test", source: SourceType = SourceType.WEB, **kwargs) -> Mention:
+    """Helper to create a Mention object for testing."""
+    return Mention(
+        source=source,
+        keyword=keyword,
+        url="https://example.com",
+        title="Test Title",
+        content="Test content",
+        **kwargs,
+    )
+
+
+class TestDatabaseStorage(unittest.TestCase):
+    """Test DatabaseStorage functionality."""
+
     def setUp(self):
-        """Set up test fixture with temporary database."""
+        """Set up test fixture with a temporary SQLite database."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_osint.db")
-        self.db = Database(self.db_path)
-    
+        self.db = DatabaseStorage(f"sqlite:///{self.db_path}")
+
     def tearDown(self):
-        """Clean up test database."""
-        self.db.close()
-        if os.path.exists(self.db_path):
-            os.remove(self.db_path)
-        os.rmdir(self.temp_dir)
-    
+        """Clean up the temporary database."""
+        self.db.engine.dispose()
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
     def test_save_mention(self):
-        """Test saving a single mention."""
-        mention = {
-            "text": "Test mention",
-            "source": "test",
-            "keywords": ["test"]
-        }
-        
+        """Test saving a single mention returns an integer ID."""
+        mention = _make_mention()
         doc_id = self.db.save_mention(mention)
         self.assertIsInstance(doc_id, int)
-        
-        # Verify it was saved
-        mentions = self.db.get_mentions()
-        self.assertEqual(len(mentions), 1)
-        self.assertEqual(mentions[0]["text"], "Test mention")
-    
+
+        saved = self.db.get_mentions()
+        self.assertEqual(len(saved), 1)
+        self.assertEqual(saved[0].keyword, "test")
+
     def test_save_mentions(self):
-        """Test saving multiple mentions."""
-        mentions = [
-            {"text": "Mention 1", "source": "test", "keywords": ["test"]},
-            {"text": "Mention 2", "source": "test", "keywords": ["test"]},
-        ]
-        
-        doc_ids = self.db.save_mentions(mentions)
-        self.assertEqual(len(doc_ids), 2)
-        
-        # Verify they were saved
-        saved_mentions = self.db.get_mentions()
-        self.assertEqual(len(saved_mentions), 2)
-    
-    def test_get_mentions_with_filter(self):
-        """Test retrieving mentions with filters."""
-        mentions = [
-            {"text": "Twitter mention", "source": "twitter", "keywords": ["Python"]},
-            {"text": "Reddit mention", "source": "reddit", "keywords": ["AI"]},
-        ]
-        self.db.save_mentions(mentions)
-        
-        # Filter by source
-        twitter_mentions = self.db.get_mentions(source="twitter")
-        self.assertEqual(len(twitter_mentions), 1)
-        self.assertEqual(twitter_mentions[0]["source"], "twitter")
-        
-        # Filter by keyword
-        python_mentions = self.db.get_mentions(keyword="Python")
-        self.assertEqual(len(python_mentions), 1)
-    
+        """Test saving multiple mentions returns the correct count."""
+        mentions = [_make_mention(keyword="kw1"), _make_mention(keyword="kw2")]
+        count = self.db.save_mentions(mentions)
+        self.assertEqual(count, 2)
+
+        saved = self.db.get_mentions()
+        self.assertEqual(len(saved), 2)
+
+    def test_get_mentions_filter_by_keyword(self):
+        """Test filtering mentions by keyword."""
+        self.db.save_mentions([
+            _make_mention(keyword="Python"),
+            _make_mention(keyword="AI"),
+        ])
+
+        results = self.db.get_mentions(keyword="Python")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].keyword, "Python")
+
+    def test_get_mentions_filter_by_source(self):
+        """Test filtering mentions by source."""
+        self.db.save_mentions([
+            _make_mention(source=SourceType.TWITTER),
+            _make_mention(source=SourceType.REDDIT),
+        ])
+
+        results = self.db.get_mentions(source=SourceType.TWITTER)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].source, SourceType.TWITTER)
+
     def test_get_mentions_with_limit(self):
-        """Test retrieving mentions with limit."""
-        mentions = [
-            {"text": f"Mention {i}", "source": "test", "keywords": ["test"]}
-            for i in range(10)
-        ]
-        self.db.save_mentions(mentions)
-        
-        limited = self.db.get_mentions(limit=5)
-        self.assertEqual(len(limited), 5)
-    
-    def test_get_by_sentiment(self):
-        """Test retrieving mentions by sentiment."""
-        mentions = [
-            {
-                "text": "Positive mention",
-                "source": "test",
-                "keywords": ["test"],
-                "sentiment": {"sentiment": "positive"}
-            },
-            {
-                "text": "Negative mention",
-                "source": "test",
-                "keywords": ["test"],
-                "sentiment": {"sentiment": "negative"}
-            },
-        ]
-        self.db.save_mentions(mentions)
-        
-        positive = self.db.get_by_sentiment("positive")
-        self.assertEqual(len(positive), 1)
-        self.assertEqual(positive[0]["text"], "Positive mention")
-    
-    def test_save_query(self):
-        """Test saving query records."""
-        doc_id = self.db.save_query(
-            keywords=["test"],
-            sources=["web"],
-            results_count=5
-        )
-        
-        self.assertIsInstance(doc_id, int)
-    
-    def test_get_statistics(self):
-        """Test database statistics."""
-        mentions = [
-            {
-                "text": "Tweet",
-                "source": "twitter",
-                "keywords": ["test"],
-                "sentiment": {"sentiment": "positive"}
-            },
-            {
-                "text": "Post",
-                "source": "reddit",
-                "keywords": ["test"],
-                "sentiment": {"sentiment": "negative"}
-            },
-        ]
-        self.db.save_mentions(mentions)
-        self.db.save_query(["test"], ["social"], 2)
-        
-        stats = self.db.get_statistics()
-        
+        """Test that the limit parameter is respected."""
+        self.db.save_mentions([_make_mention(keyword=f"kw{i}") for i in range(10)])
+
+        results = self.db.get_mentions(limit=5)
+        self.assertEqual(len(results), 5)
+
+    def test_get_stats(self):
+        """Test that get_stats returns correct counts."""
+        self.db.save_mentions([
+            _make_mention(source=SourceType.TWITTER),
+            _make_mention(source=SourceType.REDDIT),
+        ])
+
+        stats = self.db.get_stats(days=7)
         self.assertEqual(stats["total_mentions"], 2)
-        self.assertEqual(stats["sources"]["twitter"], 1)
-        self.assertEqual(stats["sources"]["reddit"], 1)
-        self.assertEqual(stats["sentiments"]["positive"], 1)
-        self.assertEqual(stats["sentiments"]["negative"], 1)
-        self.assertEqual(stats["total_queries"], 1)
-    
-    def test_clear_mentions(self):
-        """Test clearing mentions."""
-        mentions = [
-            {"text": "Mention 1", "source": "test", "keywords": ["test"]},
-        ]
-        self.db.save_mentions(mentions)
-        
-        self.db.clear_mentions()
-        
-        all_mentions = self.db.get_mentions()
-        self.assertEqual(len(all_mentions), 0)
-    
-    def test_clear_all(self):
-        """Test clearing all data."""
-        mentions = [{"text": "Test", "source": "test", "keywords": ["test"]}]
-        self.db.save_mentions(mentions)
-        self.db.save_query(["test"], ["web"], 1)
-        
-        self.db.clear_all()
-        
-        stats = self.db.get_statistics()
-        self.assertEqual(stats["total_mentions"], 0)
-        self.assertEqual(stats["total_queries"], 0)
+        self.assertIn("by_source", stats)
+        self.assertEqual(stats["by_source"].get("twitter"), 1)
+        self.assertEqual(stats["by_source"].get("reddit"), 1)
+
+    def test_clear_old_mentions(self):
+        """Test that clear_old_mentions removes mentions older than the cutoff."""
+        old_time = datetime.now() - timedelta(days=60)
+        recent_time = datetime.now() - timedelta(days=1)
+
+        self.db.save_mentions([
+            _make_mention(keyword="old", timestamp=old_time),
+            _make_mention(keyword="recent", timestamp=recent_time),
+        ])
+
+        deleted = self.db.clear_old_mentions(days=30)
+        self.assertEqual(deleted, 1)
+
+        remaining = self.db.get_mentions()
+        self.assertEqual(len(remaining), 1)
+        self.assertEqual(remaining[0].keyword, "recent")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
