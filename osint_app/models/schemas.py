@@ -52,12 +52,12 @@ class Mention(BaseModel):
 class SearchQuery(BaseModel):
     """Parameters for a search request."""
 
-    keyword: str
-    google_results: int = 10
-    twitter_results: int = 10
-    reddit_results: int = 10
-    news_results: int = 10
-    github_results: int = 10
+    keyword: str = Field(min_length=1)
+    google_results: int = Field(default=10, ge=0)
+    twitter_results: int = Field(default=10, ge=0)
+    reddit_results: int = Field(default=10, ge=0)
+    news_results: int = Field(default=10, ge=0)
+    github_results: int = Field(default=10, ge=0)
 
     # Per-source toggles used by the API
     enable_google: bool = True
