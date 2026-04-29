@@ -2,9 +2,9 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class SourceType(str, Enum):
@@ -66,6 +66,26 @@ class SearchQuery(BaseModel):
     enable_news: bool = True
     enable_github: bool = True
     enable_sentiment: bool = True
+
+    @field_validator("keyword")
+    @classmethod
+    def keyword_must_not_be_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("keyword must not be empty")
+        return v
+
+    @field_validator(
+        "google_results",
+        "twitter_results",
+        "reddit_results",
+        "news_results",
+        "github_results",
+    )
+    @classmethod
+    def results_must_be_positive(cls, v: int) -> int:
+        if v < 0:
+            raise ValueError("result count must be non-negative")
+        return v
 
 
 class ReconResult(BaseModel):

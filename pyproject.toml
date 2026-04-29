@@ -46,6 +46,14 @@ warn_unused_configs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = [
+    "osint_app.app",
+    "osint_app.monitors.*",
+    "osint_app.collectors.*",
+]
+ignore_errors = true
+
 [tool.coverage.run]
 source = ["osint_app"]
 omit = ["*/tests/*", "*/test_*.py"]

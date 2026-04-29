@@ -1,7 +1,7 @@
 """Sentiment analysis utilities."""
 
 import logging
-from typing import Optional, Tuple
+from typing import Any, Callable, Optional, Tuple, Union
 
 try:
     from transformers import pipeline
@@ -23,12 +23,14 @@ class SentimentAnalyzer:
             model_name: Hugging Face model name for sentiment analysis
         """
         self.model_name = model_name
-        self.pipeline = None
+        self.pipeline: Optional[Callable[..., Any]] = None
         self.enabled = TRANSFORMERS_AVAILABLE
 
         if self.enabled:
             try:
-                self.pipeline = pipeline("sentiment-analysis", model=model_name)
+                self.pipeline = pipeline(  # type: ignore[call-overload]
+                    "sentiment-analysis", model=model_name
+                )
             except Exception as e:
                 logging.warning(f"Failed to load sentiment model: {e}")
                 self.enabled = False
@@ -46,7 +48,7 @@ class SentimentAnalyzer:
         Returns:
             Tuple of (sentiment, confidence_score)
         """
-        if not self.is_available() or not text:
+        if not self.is_available() or self.pipeline is None or not text:
             return None, None
 
         try:
@@ -178,7 +180,9 @@ class SimpleSentimentAnalyzer:
         return mention
 
 
-def get_sentiment_analyzer(use_transformers: bool = True) -> object:
+def get_sentiment_analyzer(
+    use_transformers: bool = True,
+) -> Union["SentimentAnalyzer", "SimpleSentimentAnalyzer"]:
     """Factory function to get appropriate sentiment analyzer.
 
     Args:

@@ -55,8 +55,8 @@ class WebMonitor(BaseMonitor):
             mention = Mention(
                 platform="Web",
                 content=article,
-                author=f"Author {i+1}",
-                url=f"https://example.com/article-{i+1}",
+                author=f"Author {i + 1}",
+                url=f"https://example.com/article-{i + 1}",
                 timestamp=datetime.now(),
                 engagement=format_engagement(
                     likes=30 * (i + 1), shares=10 * (i + 1), comments=8 * (i + 1)

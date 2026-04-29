@@ -1,7 +1,7 @@
 """Reddit monitor for tracking mentions on Reddit."""
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from osint_app.models import Mention, SearchQuery
 from osint_app.monitors.base import BaseMonitor
@@ -56,8 +56,8 @@ class RedditMonitor(BaseMonitor):
             mention = Mention(
                 platform="Reddit",
                 content=post,
-                author=f"u/redditor{i+1}",
-                url=f"https://reddit.com/r/technology/comments/{100000+i}",
+                author=f"u/redditor{i + 1}",
+                url=f"https://reddit.com/r/technology/comments/{100000 + i}",
                 timestamp=datetime.now(),
                 engagement=format_engagement(likes=50 * (i + 1), shares=0, comments=15 * (i + 1)),
                 sentiment=analyze_sentiment(post),

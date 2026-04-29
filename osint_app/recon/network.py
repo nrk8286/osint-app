@@ -2,11 +2,10 @@
 
 import re
 import socket
-from datetime import datetime
 from typing import Dict, Optional
 
 try:
-    import requests
+    import requests  # type: ignore[import-untyped]
 
     REQUESTS_AVAILABLE = True
 except ImportError:

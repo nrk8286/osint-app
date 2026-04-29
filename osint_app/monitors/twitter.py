@@ -93,8 +93,8 @@ class TwitterMonitor(BaseMonitor):
             mention = Mention(
                 platform="Twitter",
                 content=tweet,
-                author=f"@user{i+1}",
-                url=f"https://twitter.com/user{i+1}/status/{1000000+i}",
+                author=f"@user{i + 1}",
+                url=f"https://twitter.com/user{i + 1}/status/{1000000 + i}",
                 timestamp=datetime.now(),
                 engagement=format_engagement(
                     likes=10 * (i + 1), shares=5 * (i + 1), comments=2 * (i + 1)

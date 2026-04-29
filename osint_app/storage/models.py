@@ -3,9 +3,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime
-from sqlalchemy import Enum as SQLEnum
-from sqlalchemy import Float, Integer, String, Text
+from sqlalchemy import JSON, DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 

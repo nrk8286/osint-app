@@ -1,15 +1,15 @@
 """FastAPI REST API for OSINT monitoring platform."""
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from osint_app.core.config import config
 from osint_app.core.monitor import OSINTMonitor
-from osint_app.models.schemas import Mention, ReconResult, SearchQuery, SourceType
+from osint_app.models.schemas import SearchQuery, SourceType
 from osint_app.recon.network import NetworkRecon
 from osint_app.storage.database import DatabaseStorage
 
