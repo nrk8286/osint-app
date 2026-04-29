@@ -11,8 +11,8 @@ try:
 except ImportError:
     GOOGLE_AVAILABLE = False
 
-from osint_app.sources.base import BaseSource
 from osint_app.models.schemas import Mention, SourceType
+from osint_app.sources.base import BaseSource
 
 
 class GoogleSource(BaseSource):

@@ -1,14 +1,15 @@
 """Database storage backend implementation."""
 
-from typing import Optional, List
-from datetime import datetime, timedelta
-from sqlalchemy import create_engine, select, func, delete
-from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
+from datetime import datetime, timedelta
+from typing import List, Optional
 
-from osint_app.storage.models import Base, MentionDB
-from osint_app.models.schemas import Mention, SourceType, SentimentScore
+from sqlalchemy import create_engine, delete, func, select
+from sqlalchemy.orm import sessionmaker
+
 from osint_app.core.config import config
+from osint_app.models.schemas import Mention, SentimentScore, SourceType
+from osint_app.storage.models import Base, MentionDB
 
 
 class DatabaseStorage:
@@ -196,7 +197,5 @@ class DatabaseStorage:
         """
         with self.get_session() as session:
             cutoff = datetime.now() - timedelta(days=days)
-            result = session.execute(
-                delete(MentionDB).where(MentionDB.timestamp < cutoff)
-            )
+            result = session.execute(delete(MentionDB).where(MentionDB.timestamp < cutoff))
             return result.rowcount or 0

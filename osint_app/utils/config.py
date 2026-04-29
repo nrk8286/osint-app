@@ -3,7 +3,8 @@ Configuration manager for OSINT App.
 """
 
 import os
-from typing import Dict, Any
+from typing import Any, Dict
+
 from dotenv import load_dotenv
 
 
