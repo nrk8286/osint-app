@@ -1,8 +1,8 @@
 """Base class for data source integrations."""
 
+import asyncio
 from abc import ABC, abstractmethod
 from typing import List
-import asyncio
 
 from osint_app.models.schemas import Mention
 

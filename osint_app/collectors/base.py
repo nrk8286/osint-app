@@ -3,8 +3,8 @@ Base collector for OSINT data collection.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List
 
 
 class BaseCollector(ABC):

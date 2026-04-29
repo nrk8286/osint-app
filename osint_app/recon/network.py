@@ -117,9 +117,7 @@ class NetworkRecon:
                 "server": resp.headers.get("Server"),
                 "all_headers": dict(resp.headers),
                 "security_headers": security,
-                "missing_security_headers": [
-                    h for h, v in security.items() if v is None
-                ],
+                "missing_security_headers": [h for h, v in security.items() if v is None],
             }
         except Exception as exc:
             data = {"error": str(exc)}

@@ -2,9 +2,9 @@
 Report generator for OSINT data.
 """
 
-from typing import List, Dict, Any
 import json
 from datetime import datetime
+from typing import Any, Dict, List
 
 
 class ReportGenerator:
