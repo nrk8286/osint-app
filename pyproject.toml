@@ -47,6 +47,11 @@ disallow_untyped_defs = false
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
+# Legacy monitor/collector modules use an outdated model API (old SearchQuery/Mention
+# with 'keywords', 'platforms', 'max_results' fields) that is incompatible with the
+# current Pydantic schemas. These modules are not actively used by the main application
+# and are kept only for backwards compatibility. Fixing them would require a substantial
+# refactor unrelated to the current CI fix.
 module = [
     "osint_app.app",
     "osint_app.monitors.*",

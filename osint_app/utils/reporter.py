@@ -59,7 +59,7 @@ class ReportGenerator:
         report.append("")
 
         # Source breakdown
-        sources: dict = {}
+        sources: Dict[str, int] = {}
         for mention in mentions:
             source = mention.get("source", "unknown")
             sources[source] = sources.get(source, 0) + 1

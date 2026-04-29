@@ -82,7 +82,7 @@ class SearchQuery(BaseModel):
         "github_results",
     )
     @classmethod
-    def results_must_be_positive(cls, v: int) -> int:
+    def results_must_be_non_negative(cls, v: int) -> int:
         if v < 0:
             raise ValueError("result count must be non-negative")
         return v
