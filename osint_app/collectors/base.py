@@ -3,8 +3,8 @@ Base collector for OSINT data collection.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List
 
 
 class BaseCollector(ABC):
@@ -18,7 +18,7 @@ class BaseCollector(ABC):
             keywords: List of keywords to monitor
         """
         self.keywords = keywords
-        self.results = []
+        self.results: List[Dict[str, Any]] = []
 
     @abstractmethod
     def collect(self) -> List[Dict[str, Any]]:

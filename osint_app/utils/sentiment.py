@@ -1,7 +1,7 @@
 """Sentiment analysis utilities."""
 
-from typing import Optional, Tuple
 import logging
+from typing import Any, Optional, Tuple, Union
 
 try:
     from transformers import pipeline
@@ -10,7 +10,7 @@ try:
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
 
-from osint_app.models.schemas import SentimentScore, Mention
+from osint_app.models.schemas import Mention, SentimentScore
 
 
 class SentimentAnalyzer:
@@ -23,7 +23,7 @@ class SentimentAnalyzer:
             model_name: Hugging Face model name for sentiment analysis
         """
         self.model_name = model_name
-        self.pipeline = None
+        self.pipeline: Optional[Any] = None
         self.enabled = TRANSFORMERS_AVAILABLE
 
         if self.enabled:
@@ -53,6 +53,8 @@ class SentimentAnalyzer:
             # Truncate text to model's max length (512 tokens for BERT-based models)
             text = text[:512]
 
+            # self.pipeline is guaranteed non-None by is_available() check above
+            assert self.pipeline is not None
             result = self.pipeline(text)[0]
             label = result["label"].upper()
             score = result["score"]
@@ -178,7 +180,9 @@ class SimpleSentimentAnalyzer:
         return mention
 
 
-def get_sentiment_analyzer(use_transformers: bool = True) -> object:
+def get_sentiment_analyzer(
+    use_transformers: bool = True,
+) -> Union["SentimentAnalyzer", "SimpleSentimentAnalyzer"]:
     """Factory function to get appropriate sentiment analyzer.
 
     Args:

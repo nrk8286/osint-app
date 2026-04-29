@@ -3,8 +3,8 @@
 from osint_app.models.schemas import (
     Mention,
     SearchQuery,
-    SourceType,
     SentimentScore,
+    SourceType,
 )
 
 __all__ = ["Mention", "SearchQuery", "SourceType", "SentimentScore"]

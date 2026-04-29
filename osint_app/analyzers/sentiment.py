@@ -2,8 +2,9 @@
 Sentiment analyzer for OSINT mentions.
 """
 
+from typing import Any, Dict, List
+
 from textblob import TextBlob
-from typing import Dict, Any, List
 
 
 class SentimentAnalyzer:

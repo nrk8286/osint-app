@@ -4,8 +4,9 @@ Note: Current implementation uses placeholder data.
 For production use, integrate with real search APIs or web scraping libraries.
 """
 
-from typing import List, Dict, Any
 import time
+from typing import Any, Dict, List, Optional
+
 from .base import BaseCollector
 
 
@@ -123,7 +124,7 @@ class NewsCollector(BaseCollector):
 class SocialMediaCollector(BaseCollector):
     """Generic social media collector."""
 
-    def __init__(self, keywords: List[str], platforms: List[str] = None):
+    def __init__(self, keywords: List[str], platforms: Optional[List[str]] = None):
         """
         Initialize social media collector.
 

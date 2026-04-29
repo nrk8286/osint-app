@@ -1,16 +1,14 @@
 """Enhanced CLI for OSINT monitoring platform with interactive menu and recon."""
 
-import asyncio
-import sys
-from typing import Optional
 import argparse
+import asyncio
+from typing import Optional
 
 try:
     from rich.console import Console
-    from rich.table import Table
-    from rich.progress import Progress, SpinnerColumn, TextColumn
     from rich.panel import Panel
-    from rich.prompt import Prompt, IntPrompt
+    from rich.progress import Progress, SpinnerColumn, TextColumn
+    from rich.table import Table
 
     RICH_AVAILABLE = True
 except ImportError:
@@ -110,7 +108,9 @@ class OSINTCLI:
         data = result.data
 
         if RICH_AVAILABLE:
-            self.console.print(f"\n[bold cyan]{result.recon_type.upper()} - {result.target}[/bold cyan]")
+            self.console.print(
+                f"\n[bold cyan]{result.recon_type.upper()} - {result.target}[/bold cyan]"
+            )
             self.console.print(f"[dim]{result.timestamp.isoformat()}[/dim]\n")
         else:
             print(f"\n{result.recon_type.upper()} - {result.target}")
@@ -341,33 +341,25 @@ def main():
     parser.add_argument(
         "--reddit", type=int, default=10, help="Number of Reddit results (default: 10)"
     )
-    parser.add_argument(
-        "--news", type=int, default=10, help="Number of News results (default: 10)"
-    )
+    parser.add_argument("--news", type=int, default=10, help="Number of News results (default: 10)")
     parser.add_argument(
         "--github", type=int, default=10, help="Number of GitHub results (default: 10)"
     )
     parser.add_argument("--output", "-o", help="Output filename (CSV or JSON)")
     parser.add_argument("--stats", action="store_true", help="Show statistics from database")
     parser.add_argument("--days", type=int, default=7, help="Days for statistics (default: 7)")
-    parser.add_argument(
-        "--sources", help="Comma-separated source list (e.g. google,github,reddit)"
-    )
-    parser.add_argument(
-        "--recon", metavar="DOMAIN", help="Run DNS/IP reconnaissance on a domain"
-    )
-    parser.add_argument(
-        "--headers", metavar="URL", help="Analyze HTTP headers of a URL"
-    )
-    parser.add_argument(
-        "--interactive", "-i", action="store_true", help="Launch interactive menu"
-    )
+    parser.add_argument("--sources", help="Comma-separated source list (e.g. google,github,reddit)")
+    parser.add_argument("--recon", metavar="DOMAIN", help="Run DNS/IP reconnaissance on a domain")
+    parser.add_argument("--headers", metavar="URL", help="Analyze HTTP headers of a URL")
+    parser.add_argument("--interactive", "-i", action="store_true", help="Launch interactive menu")
 
     args = parser.parse_args()
     cli = OSINTCLI()
 
     # Interactive mode
-    if args.interactive or (not args.keyword and not args.stats and not args.recon and not args.headers):
+    if args.interactive or (
+        not args.keyword and not args.stats and not args.recon and not args.headers
+    ):
         asyncio.run(cli.interactive_menu())
         return
 

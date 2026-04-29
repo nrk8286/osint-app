@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from typing import List
-import asyncio
 
 try:
     import aiohttp
@@ -11,9 +10,9 @@ try:
 except ImportError:
     NEWS_HTTP_AVAILABLE = False
 
-from osint_app.sources.base import BaseSource
-from osint_app.models.schemas import Mention, SourceType
 from osint_app.core.config import config
+from osint_app.models.schemas import Mention, SourceType
+from osint_app.sources.base import BaseSource
 
 
 class NewsAPISource(BaseSource):

@@ -3,21 +3,21 @@
 import asyncio
 import hashlib
 import json
-from typing import Dict, List, Optional
-from datetime import datetime
 from collections import Counter
+from datetime import datetime
+from typing import Dict, List, Optional
 
 import pandas as pd
 
-from osint_app.models.schemas import Mention, SearchQuery, SourceType
-from osint_app.sources.google import GoogleSource
-from osint_app.sources.twitter import TwitterSource
-from osint_app.sources.reddit import RedditSource
-from osint_app.sources.news import NewsAPISource
+from osint_app.core.config import config
+from osint_app.models.schemas import Mention
 from osint_app.sources.github import GitHubSource
+from osint_app.sources.google import GoogleSource
+from osint_app.sources.news import NewsAPISource
+from osint_app.sources.reddit import RedditSource
+from osint_app.sources.twitter import TwitterSource
 from osint_app.storage.database import DatabaseStorage
 from osint_app.utils.sentiment import get_sentiment_analyzer
-from osint_app.core.config import config
 
 
 class OSINTMonitor:
@@ -61,12 +61,15 @@ class OSINTMonitor:
             symbol = "+" if source.is_available() else "-"
             print(f"  [{symbol}] {name.capitalize():12} : {status}")
 
-        print(f"\nFeatures:")
+        print("\nFeatures:")
         print(f"  [{'+'if self.db else '-'}] Database     : {'Enabled' if self.db else 'Disabled'}")
-        print(f"  [{'+'if self.sentiment_analyzer else '-'}] Sentiment    : {'Enabled' if self.sentiment_analyzer else 'Disabled'}")
-        print(f"  [+] Recon        : DNS / IP Info / HTTP Headers")
-        print(f"  [+] Dedup        : URL-based deduplication")
-        print(f"  [+] Relevance    : Keyword density scoring")
+        print(
+            f"  [{'+'if self.sentiment_analyzer else '-'}] Sentiment    : "
+            f"{'Enabled' if self.sentiment_analyzer else 'Disabled'}"
+        )
+        print("  [+] Recon        : DNS / IP Info / HTTP Headers")
+        print("  [+] Dedup        : URL-based deduplication")
+        print("  [+] Relevance    : Keyword density scoring")
         print()
 
     async def search_all_sources(
@@ -145,9 +148,9 @@ class OSINTMonitor:
         Returns:
             List of mentions with sentiment analysis
         """
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Collecting mentions for: '{keyword}'")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
         mentions = await self.search_all_sources(
             keyword=keyword,
@@ -187,21 +190,23 @@ class OSINTMonitor:
                 print(f"Warning: Failed to save to database: {e}")
 
         self.mentions.extend(mentions)
-        self.search_history.append({
-            "keyword": keyword,
-            "timestamp": datetime.now().isoformat(),
-            "sources": sources or list(self.sources.keys()),
-            "total_results": len(mentions),
-        })
+        self.search_history.append(
+            {
+                "keyword": keyword,
+                "timestamp": datetime.now().isoformat(),
+                "sources": sources or list(self.sources.keys()),
+                "total_results": len(mentions),
+            }
+        )
 
         self._print_summary(mentions)
         return mentions
 
     def _print_summary(self, mentions: List[Mention]):
         """Print collection summary."""
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("Collection Summary")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         by_source: Dict[str, int] = {}
         for mention in mentions:
@@ -212,7 +217,7 @@ class OSINTMonitor:
             print(f"  {source.capitalize():12} : {count} mentions")
 
         if any(m.sentiment for m in mentions):
-            print(f"\nSentiment Distribution:")
+            print("\nSentiment Distribution:")
             by_sentiment: Dict[str, int] = {}
             for mention in mentions:
                 if mention.sentiment:
@@ -223,7 +228,7 @@ class OSINTMonitor:
                 print(f"  {sentiment.capitalize():12} : {count}")
 
         print(f"\nTotal: {len(mentions)} unique mention(s)")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
     def summary_report(self) -> dict:
         """Generate a summary report of all collected mentions."""
@@ -241,31 +246,31 @@ class OSINTMonitor:
             "searches_performed": len(self.search_history),
         }
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("Summary Report")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(f"  Total mentions: {report['total_mentions']}")
         print(f"  Searches run:   {report['searches_performed']}")
 
-        print(f"\n  By source:")
+        print("\n  By source:")
         for src, count in sources.most_common():
             bar = "|" * min(count, 30)
             print(f"    {src:<15} {count:>4}  {bar}")
 
-        print(f"\n  By keyword:")
+        print("\n  By keyword:")
         for kw, count in keywords.most_common(5):
             print(f"    {kw:<25} {count:>4}")
 
-        engaged = [m for m in self.mentions if m.engagement]
+        engaged = [m for m in self.mentions if m.engagement is not None]
         if engaged:
-            total_eng = sum(m.engagement for m in engaged)
-            top = sorted(engaged, key=lambda m: m.engagement, reverse=True)[:3]
-            print(f"\n  Top engagement:")
+            total_eng = sum(m.engagement or 0 for m in engaged)
+            top = sorted(engaged, key=lambda m: m.engagement or 0, reverse=True)[:3]
+            print("\n  Top engagement:")
             print(f"    Total score: {total_eng}")
             for m in top:
                 print(f"    [{m.source.value}] {m.title[:45]}  (score: {m.engagement})")
 
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
         return report
 
     def filter_mentions(
@@ -380,9 +385,10 @@ class OSINTMonitor:
         seen = set()
         unique = []
         for m in mentions:
-            key = m.url or hashlib.md5(
-                f"{m.source.value}:{m.title}:{m.content[:100]}".encode()
-            ).hexdigest()
+            key = (
+                m.url
+                or hashlib.md5(f"{m.source.value}:{m.title}:{m.content[:100]}".encode()).hexdigest()
+            )
             if key not in seen:
                 seen.add(key)
                 unique.append(m)

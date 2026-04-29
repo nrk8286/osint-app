@@ -1,16 +1,17 @@
 """FastAPI REST API for OSINT monitoring platform."""
 
-from fastapi import FastAPI, HTTPException, Query, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Optional
 from datetime import datetime
+from typing import Optional
+
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from osint_app.core.monitor import OSINTMonitor
-from osint_app.models.schemas import Mention, SearchQuery, SourceType, ReconResult
-from osint_app.storage.database import DatabaseStorage
-from osint_app.recon.network import NetworkRecon
 from osint_app.core.config import config
+from osint_app.core.monitor import OSINTMonitor
+from osint_app.models.schemas import SearchQuery, SourceType
+from osint_app.recon.network import NetworkRecon
+from osint_app.storage.database import DatabaseStorage
 
 # Create FastAPI app
 app = FastAPI(
@@ -141,6 +142,7 @@ async def clear_old_mentions(days: int = Query(30, ge=1)):
 
 # ── Reconnaissance endpoints ──────────────────────────────────────────
 
+
 @app.get("/api/recon/dns/{domain}")
 async def recon_dns(domain: str):
     """Perform DNS lookup on a domain."""
@@ -157,6 +159,7 @@ async def recon_ip(target: str):
 
 class HeaderCheckRequest(BaseModel):
     url: str
+
 
 @app.post("/api/recon/headers")
 async def recon_headers(req: HeaderCheckRequest):
