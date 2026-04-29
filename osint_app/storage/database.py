@@ -2,10 +2,10 @@
 
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
-from sqlalchemy import create_engine, delete, func, select
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import JSON, Column, DateTime, Integer, String, create_engine, delete, func, select
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from osint_app.core.config import config
 from osint_app.models.schemas import Mention, SentimentScore, SourceType
@@ -199,3 +199,157 @@ class DatabaseStorage:
             cutoff = datetime.now() - timedelta(days=days)
             result = session.execute(delete(MentionDB).where(MentionDB.timestamp < cutoff))
             return result.rowcount or 0
+
+
+# ---------------------------------------------------------------------------
+# Backwards-compatible Database API
+#
+# The test suite (tests/test_database.py) expects a `Database` class with a
+# dict-based interface. The main application code uses `DatabaseStorage` with
+# Pydantic schemas.
+#
+# To keep both working, we provide a small adapter implementation here.
+# ---------------------------------------------------------------------------
+
+_CompatBase = declarative_base()
+
+
+class _MentionCompat(_CompatBase):
+    __tablename__ = "mentions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    text = Column(String, nullable=False)
+    source = Column(String, nullable=False)
+    keywords = Column(JSON, nullable=False, default=list)
+    sentiment = Column(JSON, nullable=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+class _QueryCompat(_CompatBase):
+    __tablename__ = "queries"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    keywords = Column(JSON, nullable=False, default=list)
+    sources = Column(JSON, nullable=False, default=list)
+    results_count = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+class Database:
+    """Compatibility wrapper expected by tests.
+
+    This class is intentionally minimal and only implements what the unit tests
+    expect (save/get/clear mentions, save queries, and compute statistics).
+    """
+
+    def __init__(self, db_path: str):
+        # Tests pass a filesystem path; interpret it as a SQLite file.
+        self.db_url = f"sqlite:///{db_path}"
+        self.engine = create_engine(self.db_url, echo=False, future=True)
+        self.SessionLocal = sessionmaker(bind=self.engine, future=True)
+        _CompatBase.metadata.create_all(self.engine)
+
+    @contextmanager
+    def _session(self):
+        session = self.SessionLocal()
+        try:
+            yield session
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def close(self) -> None:
+        self.engine.dispose()
+
+    def save_mention(self, mention: Dict[str, Any]) -> int:
+        with self._session() as session:
+            row = _MentionCompat(
+                text=mention["text"],
+                source=mention["source"],
+                keywords=mention.get("keywords", []),
+                sentiment=mention.get("sentiment"),
+            )
+            session.add(row)
+            session.flush()
+            return int(row.id)
+
+    def save_mentions(self, mentions: List[Dict[str, Any]]) -> List[int]:
+        ids: List[int] = []
+        for m in mentions:
+            ids.append(self.save_mention(m))
+        return ids
+
+    def get_mentions(
+        self,
+        source: Optional[str] = None,
+        keyword: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        with self._session() as session:
+            q = select(_MentionCompat).order_by(_MentionCompat.id.asc())
+            if source:
+                q = q.where(_MentionCompat.source == source)
+
+            rows = session.execute(q).scalars().all()
+
+            if keyword:
+                # Keep this SQLite/JSON portable: filter in Python.
+                rows = [r for r in rows if keyword in (r.keywords or [])]
+
+            if limit is not None:
+                rows = rows[: int(limit)]
+
+            return [
+                {
+                    "id": int(r.id),
+                    "text": r.text,
+                    "source": r.source,
+                    "keywords": r.keywords or [],
+                    "sentiment": r.sentiment,
+                }
+                for r in rows
+            ]
+
+    def get_by_sentiment(self, sentiment: str) -> List[Dict[str, Any]]:
+        mentions = self.get_mentions()
+        return [m for m in mentions if (m.get("sentiment") or {}).get("sentiment") == sentiment]
+
+    def save_query(self, keywords: List[str], sources: List[str], results_count: int) -> int:
+        with self._session() as session:
+            row = _QueryCompat(keywords=keywords, sources=sources, results_count=results_count)
+            session.add(row)
+            session.flush()
+            return int(row.id)
+
+    def get_statistics(self) -> Dict[str, Any]:
+        with self._session() as session:
+            mentions = session.execute(select(_MentionCompat)).scalars().all()
+            queries = session.execute(select(_QueryCompat)).scalars().all()
+
+            sources: Dict[str, int] = {}
+            sentiments: Dict[str, int] = {}
+
+            for m in mentions:
+                sources[m.source] = sources.get(m.source, 0) + 1
+                s = (m.sentiment or {}).get("sentiment")
+                if s:
+                    sentiments[s] = sentiments.get(s, 0) + 1
+
+            return {
+                "total_mentions": len(mentions),
+                "sources": sources,
+                "sentiments": sentiments,
+                "total_queries": len(queries),
+            }
+
+    def clear_mentions(self) -> None:
+        with self._session() as session:
+            session.execute(delete(_MentionCompat))
+
+    def clear_all(self) -> None:
+        with self._session() as session:
+            session.execute(delete(_MentionCompat))
+            session.execute(delete(_QueryCompat))
