@@ -1,50 +1,6 @@
-# Core dependencies
-python-dotenv>=1.0.0
-pandas>=2.0.0
-
-# Web scraping & HTTP
-requests>=2.31.0
-beautifulsoup4>=4.12.0
-googlesearch-python>=1.2.3
-aiohttp>=3.9.0
-
-# Social media APIs
-tweepy>=4.14.0
-praw>=7.7.0
-
-# Configuration and data models
-pydantic>=2.0.0
-pydantic-settings>=2.0.0
-
-# Database
-sqlalchemy>=2.0.0
-alembic>=1.12.0
-
-# Sentiment analysis
-textblob>=0.17.0
-transformers>=4.35.0
-torch>=2.1.0
-
-# API
+# Vercel deployment dependencies (minimal)
+# Only packages required by api/index.py
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
-
-# CLI
-rich>=13.7.0
-click>=8.1.0
-colorama>=0.4.6
-
-# Optional: Caching
-redis>=5.0.0
-
-# Testing
-pytest>=7.4.0
-pytest-asyncio>=0.21.0
-pytest-cov>=4.1.0
-httpx>=0.25.0
-
-# Development tools
-black>=23.11.0
-isort>=5.12.0
-mypy>=1.7.0
-flake8>=6.1.0
+pydantic>=2.0.0
+requests>=2.31.0
