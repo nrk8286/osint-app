@@ -44,13 +44,16 @@ class ReportGenerator:
         report.append("SENTIMENT ANALYSIS")
         report.append("-" * 60)
         report.append(
-            f"Positive: {sentiment_stats.get('positive', 0)} ({sentiment_stats.get('positive_pct', 0):.1f}%)"
+            f"Positive: {sentiment_stats.get('positive', 0)} "
+            f"({sentiment_stats.get('positive_pct', 0):.1f}%)"
         )
         report.append(
-            f"Negative: {sentiment_stats.get('negative', 0)} ({sentiment_stats.get('negative_pct', 0):.1f}%)"
+            f"Negative: {sentiment_stats.get('negative', 0)} "
+            f"({sentiment_stats.get('negative_pct', 0):.1f}%)"
         )
         report.append(
-            f"Neutral:  {sentiment_stats.get('neutral', 0)} ({sentiment_stats.get('neutral_pct', 0):.1f}%)"
+            f"Neutral:  {sentiment_stats.get('neutral', 0)} "
+            f"({sentiment_stats.get('neutral_pct', 0):.1f}%)"
         )
         report.append(f"Average Polarity: {sentiment_stats.get('avg_polarity', 0):.3f}")
         report.append("")
@@ -79,7 +82,8 @@ class ReportGenerator:
             sentiment_data = mention.get("sentiment", {})
             if sentiment_data:
                 report.append(
-                    f"   Sentiment: {sentiment_data.get('sentiment', 'N/A')} (polarity: {sentiment_data.get('polarity', 0):.2f})"
+                    f"   Sentiment: {sentiment_data.get('sentiment', 'N/A')} "
+                    f"(polarity: {sentiment_data.get('polarity', 0):.2f})"
                 )
 
         report.append("")
