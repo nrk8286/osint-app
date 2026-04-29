@@ -60,7 +60,7 @@ class GitHubSource(BaseSource):
             resp = requests.get(
                 "https://api.github.com/search/repositories",
                 headers=headers,
-                params={"q": keyword, "per_page": min(max_results, 30), "sort": "stars"},
+                params={"q": keyword, "per_page": str(min(max_results, 30)), "sort": "stars"},
                 timeout=15,
             )
             resp.raise_for_status()

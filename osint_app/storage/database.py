@@ -70,7 +70,7 @@ class DatabaseStorage:
             )
             session.add(db_mention)
             session.flush()
-            return db_mention.id
+            return int(db_mention.id)
 
     def save_mentions(self, mentions: List[Mention]) -> int:
         """Save multiple mentions to database.
