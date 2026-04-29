@@ -1,7 +1,7 @@
 """Sentiment analysis utilities."""
 
-from typing import Optional, Tuple
 import logging
+from typing import Optional, Tuple
 
 try:
     from transformers import pipeline
@@ -10,7 +10,7 @@ try:
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
 
-from osint_app.models.schemas import SentimentScore, Mention
+from osint_app.models.schemas import Mention, SentimentScore
 
 
 class SentimentAnalyzer:

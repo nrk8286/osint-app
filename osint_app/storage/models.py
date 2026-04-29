@@ -1,9 +1,12 @@
 """Database models using SQLAlchemy."""
 
-from datetime import datetime
-from sqlalchemy import String, Text, DateTime, Float, Integer, JSON, Enum as SQLEnum
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 import enum
+from datetime import datetime
+
+from sqlalchemy import JSON, DateTime
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy import Float, Integer, String, Text
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):

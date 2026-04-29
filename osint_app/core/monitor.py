@@ -3,21 +3,21 @@
 import asyncio
 import hashlib
 import json
-from typing import Dict, List, Optional
-from datetime import datetime
 from collections import Counter
+from datetime import datetime
+from typing import Dict, List, Optional
 
 import pandas as pd
 
+from osint_app.core.config import config
 from osint_app.models.schemas import Mention, SearchQuery, SourceType
-from osint_app.sources.google import GoogleSource
-from osint_app.sources.twitter import TwitterSource
-from osint_app.sources.reddit import RedditSource
-from osint_app.sources.news import NewsAPISource
 from osint_app.sources.github import GitHubSource
+from osint_app.sources.google import GoogleSource
+from osint_app.sources.news import NewsAPISource
+from osint_app.sources.reddit import RedditSource
+from osint_app.sources.twitter import TwitterSource
 from osint_app.storage.database import DatabaseStorage
 from osint_app.utils.sentiment import get_sentiment_analyzer
-from osint_app.core.config import config
 
 
 class OSINTMonitor:
@@ -63,7 +63,9 @@ class OSINTMonitor:
 
         print(f"\nFeatures:")
         print(f"  [{'+'if self.db else '-'}] Database     : {'Enabled' if self.db else 'Disabled'}")
-        print(f"  [{'+'if self.sentiment_analyzer else '-'}] Sentiment    : {'Enabled' if self.sentiment_analyzer else 'Disabled'}")
+        print(
+            f"  [{'+'if self.sentiment_analyzer else '-'}] Sentiment    : {'Enabled' if self.sentiment_analyzer else 'Disabled'}"
+        )
         print(f"  [+] Recon        : DNS / IP Info / HTTP Headers")
         print(f"  [+] Dedup        : URL-based deduplication")
         print(f"  [+] Relevance    : Keyword density scoring")
@@ -187,12 +189,14 @@ class OSINTMonitor:
                 print(f"Warning: Failed to save to database: {e}")
 
         self.mentions.extend(mentions)
-        self.search_history.append({
-            "keyword": keyword,
-            "timestamp": datetime.now().isoformat(),
-            "sources": sources or list(self.sources.keys()),
-            "total_results": len(mentions),
-        })
+        self.search_history.append(
+            {
+                "keyword": keyword,
+                "timestamp": datetime.now().isoformat(),
+                "sources": sources or list(self.sources.keys()),
+                "total_results": len(mentions),
+            }
+        )
 
         self._print_summary(mentions)
         return mentions
@@ -380,9 +384,10 @@ class OSINTMonitor:
         seen = set()
         unique = []
         for m in mentions:
-            key = m.url or hashlib.md5(
-                f"{m.source.value}:{m.title}:{m.content[:100]}".encode()
-            ).hexdigest()
+            key = (
+                m.url
+                or hashlib.md5(f"{m.source.value}:{m.title}:{m.content[:100]}".encode()).hexdigest()
+            )
             if key not in seen:
                 seen.add(key)
                 unique.append(m)

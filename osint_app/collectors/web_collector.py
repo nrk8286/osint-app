@@ -4,8 +4,9 @@ Note: Current implementation uses placeholder data.
 For production use, integrate with real search APIs or web scraping libraries.
 """
 
-from typing import List, Dict, Any
 import time
+from typing import Any, Dict, List
+
 from .base import BaseCollector
 
 

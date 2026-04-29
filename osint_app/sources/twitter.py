@@ -1,8 +1,8 @@
 """Twitter source integration."""
 
+import asyncio
 from datetime import datetime
 from typing import List
-import asyncio
 
 try:
     import tweepy
@@ -11,9 +11,9 @@ try:
 except ImportError:
     TWITTER_AVAILABLE = False
 
-from osint_app.sources.base import BaseSource
-from osint_app.models.schemas import Mention, SourceType
 from osint_app.core.config import config
+from osint_app.models.schemas import Mention, SourceType
+from osint_app.sources.base import BaseSource
 
 
 class TwitterSource(BaseSource):
