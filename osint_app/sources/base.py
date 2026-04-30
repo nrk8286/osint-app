@@ -1,6 +1,7 @@
 """Base class for data source integrations."""
 
 import asyncio
+import time
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -43,7 +44,7 @@ class BaseSource(ABC):
     async def search_with_retry(
         self, keyword: str, max_results: int = 10, max_retries: int = 3
     ) -> List[Mention]:
-        """Search with retry logic.
+        """Search with retry logic and agent activity logging.
 
         Args:
             keyword: Search term
@@ -53,12 +54,21 @@ class BaseSource(ABC):
         Returns:
             List of mentions
         """
+        from osint_app.utils.agent_logger import agent_logger
+
+        agent_logger.agent_start(self.name, keyword)
+        start_ms = time.monotonic() * 1000
+
         for attempt in range(max_retries):
             try:
-                return await self.search(keyword, max_results)
+                results = await self.search(keyword, max_results)
+                duration_ms = time.monotonic() * 1000 - start_ms
+                agent_logger.agent_result(self.name, keyword, len(results), duration_ms)
+                return results
             except Exception as e:
                 if attempt == max_retries - 1:
-                    print(f"Error in {self.name} after {max_retries} attempts: {e}")
+                    duration_ms = time.monotonic() * 1000 - start_ms
+                    agent_logger.agent_error(self.name, keyword, str(e))
                     return []
                 await asyncio.sleep(2**attempt)  # Exponential backoff
         return []

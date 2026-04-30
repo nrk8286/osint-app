@@ -83,6 +83,52 @@ class RedisConfig(BaseSettings):
     enabled: bool = False
 
 
+class ShodanConfig(BaseSettings):
+    """Shodan API configuration."""
+
+    model_config = SettingsConfigDict(
+        env_prefix="SHODAN_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
+    api_key: Optional[str] = None
+
+    @property
+    def is_configured(self) -> bool:
+        """Check if Shodan API is properly configured."""
+        return bool(self.api_key)
+
+
+class YouTubeConfig(BaseSettings):
+    """YouTube Data API v3 configuration."""
+
+    model_config = SettingsConfigDict(
+        env_prefix="YOUTUBE_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
+    api_key: Optional[str] = None
+
+    @property
+    def is_configured(self) -> bool:
+        """Check if YouTube API is properly configured."""
+        return bool(self.api_key)
+
+
+class TelegramConfig(BaseSettings):
+    """Telegram API configuration."""
+
+    model_config = SettingsConfigDict(
+        env_prefix="TELEGRAM_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
+    api_id: Optional[str] = None
+    api_hash: Optional[str] = None
+
+    @property
+    def is_configured(self) -> bool:
+        """Check if Telegram API is properly configured."""
+        return bool(self.api_id and self.api_hash)
+
+
 class AppConfig(BaseSettings):
     """Main application configuration."""
 
@@ -109,12 +155,23 @@ class AppConfig(BaseSettings):
     max_retries: int = 3
     request_timeout: int = 30
 
+    # RSS feeds (comma-separated list of feed URLs)
+    rss_feeds: str = ""
+
+    # Agent activity log settings
+    log_to_db: bool = True
+    log_file: str = "logs/agent_activity.jsonl"
+    log_ring_buffer_size: int = 500
+
     # Sub-configurations
     twitter: TwitterConfig = TwitterConfig()
     reddit: RedditConfig = RedditConfig()
     news_api: NewsAPIConfig = NewsAPIConfig()
     database: DatabaseConfig = DatabaseConfig()
     redis: RedisConfig = RedisConfig()
+    shodan: ShodanConfig = ShodanConfig()
+    youtube: YouTubeConfig = YouTubeConfig()
+    telegram: TelegramConfig = TelegramConfig()
 
 
 # Global config instance

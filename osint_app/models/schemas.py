@@ -17,6 +17,11 @@ class SourceType(str, Enum):
     GITHUB = "github"
     WEB = "web"
     RSS = "rss"
+    HACKERNEWS = "hackernews"
+    PASTEBIN = "pastebin"
+    YOUTUBE = "youtube"
+    SHODAN = "shodan"
+    TELEGRAM = "telegram"
 
 
 class SentimentScore(str, Enum):
@@ -58,6 +63,12 @@ class SearchQuery(BaseModel):
     reddit_results: int = 10
     news_results: int = 10
     github_results: int = 10
+    hackernews_results: int = 10
+    pastebin_results: int = 10
+    youtube_results: int = 10
+    shodan_results: int = 10
+    telegram_results: int = 10
+    rss_results: int = 10
 
     # Per-source toggles used by the API
     enable_google: bool = True
@@ -65,6 +76,12 @@ class SearchQuery(BaseModel):
     enable_reddit: bool = True
     enable_news: bool = True
     enable_github: bool = True
+    enable_hackernews: bool = True
+    enable_pastebin: bool = True
+    enable_youtube: bool = True
+    enable_shodan: bool = True
+    enable_telegram: bool = True
+    enable_rss: bool = True
     enable_sentiment: bool = True
 
 

@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import json
+import time
 from collections import Counter
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -13,10 +14,17 @@ from osint_app.core.config import config
 from osint_app.models.schemas import Mention, SearchQuery, SourceType
 from osint_app.sources.github import GitHubSource
 from osint_app.sources.google import GoogleSource
+from osint_app.sources.hackernews import HackerNewsSource
 from osint_app.sources.news import NewsAPISource
+from osint_app.sources.pastebin import PastebinSource
 from osint_app.sources.reddit import RedditSource
+from osint_app.sources.rss import RSSSource
+from osint_app.sources.shodan import ShodanSource
+from osint_app.sources.telegram import TelegramSource
 from osint_app.sources.twitter import TwitterSource
+from osint_app.sources.youtube import YouTubeSource
 from osint_app.storage.database import DatabaseStorage
+from osint_app.utils.agent_logger import agent_logger
 from osint_app.utils.sentiment import get_sentiment_analyzer
 
 
@@ -36,6 +44,12 @@ class OSINTMonitor:
             "reddit": RedditSource(),
             "news": NewsAPISource(),
             "github": GitHubSource(),
+            "hackernews": HackerNewsSource(),
+            "pastebin": PastebinSource(),
+            "youtube": YouTubeSource(),
+            "shodan": ShodanSource(),
+            "telegram": TelegramSource(),
+            "rss": RSSSource(),
         }
 
         self.db = DatabaseStorage() if use_database else None
@@ -79,6 +93,12 @@ class OSINTMonitor:
         reddit_results: int = 10,
         news_results: int = 10,
         github_results: int = 10,
+        hackernews_results: int = 10,
+        pastebin_results: int = 10,
+        youtube_results: int = 10,
+        shodan_results: int = 10,
+        telegram_results: int = 10,
+        rss_results: int = 10,
         sources: Optional[List[str]] = None,
     ) -> List[Mention]:
         """Search all available sources concurrently.
@@ -90,6 +110,12 @@ class OSINTMonitor:
             reddit_results: Number of Reddit results
             news_results: Number of news results
             github_results: Number of GitHub results
+            hackernews_results: Number of Hacker News results
+            pastebin_results: Number of Pastebin results
+            youtube_results: Number of YouTube results
+            shodan_results: Number of Shodan results
+            telegram_results: Number of Telegram results
+            rss_results: Number of RSS results
             sources: Limit to these source names (default: all)
 
         Returns:
@@ -102,6 +128,12 @@ class OSINTMonitor:
             "reddit": reddit_results,
             "news": news_results,
             "github": github_results,
+            "hackernews": hackernews_results,
+            "pastebin": pastebin_results,
+            "youtube": youtube_results,
+            "shodan": shodan_results,
+            "telegram": telegram_results,
+            "rss": rss_results,
         }
 
         for name, source in self.sources.items():
@@ -117,7 +149,7 @@ class OSINTMonitor:
             if isinstance(result, list):
                 all_mentions.extend(result)
             elif isinstance(result, Exception):
-                print(f"Warning: Source error: {result}")
+                agent_logger.agent_step("monitor", f"Source error: {result}", keyword=keyword)
 
         return all_mentions
 
@@ -129,6 +161,12 @@ class OSINTMonitor:
         reddit_results: int = 10,
         news_results: int = 10,
         github_results: int = 10,
+        hackernews_results: int = 10,
+        pastebin_results: int = 10,
+        youtube_results: int = 10,
+        shodan_results: int = 10,
+        telegram_results: int = 10,
+        rss_results: int = 10,
         sources: Optional[List[str]] = None,
         enable_sentiment: bool = True,
     ) -> List[Mention]:
@@ -141,12 +179,24 @@ class OSINTMonitor:
             reddit_results: Number of Reddit results
             news_results: Number of news results
             github_results: Number of GitHub results
+            hackernews_results: Number of Hacker News results
+            pastebin_results: Number of Pastebin results
+            youtube_results: Number of YouTube results
+            shodan_results: Number of Shodan results
+            telegram_results: Number of Telegram results
+            rss_results: Number of RSS results
             sources: Limit to these source names
             enable_sentiment: Whether to analyze sentiment
 
         Returns:
             List of mentions with sentiment analysis
         """
+        collection_start = time.monotonic() * 1000
+        active_sources = sources or [
+            n for n, s in self.sources.items() if s.is_available()
+        ]
+        agent_logger.collection_started(keyword, active_sources)
+
         print(f"\n{'='*60}")
         print(f"Collecting mentions for: '{keyword}'")
         print(f"{'='*60}\n")
@@ -158,6 +208,12 @@ class OSINTMonitor:
             reddit_results=reddit_results,
             news_results=news_results,
             github_results=github_results,
+            hackernews_results=hackernews_results,
+            pastebin_results=pastebin_results,
+            youtube_results=youtube_results,
+            shodan_results=shodan_results,
+            telegram_results=telegram_results,
+            rss_results=rss_results,
             sources=sources,
         )
 
@@ -197,6 +253,9 @@ class OSINTMonitor:
                 "total_results": len(mentions),
             }
         )
+
+        duration_ms = time.monotonic() * 1000 - collection_start
+        agent_logger.collection_done(keyword, len(mentions), duration_ms)
 
         self._print_summary(mentions)
         return mentions
@@ -402,6 +461,12 @@ def collect_mentions_sync(
     reddit_results: int = 10,
     news_results: int = 10,
     github_results: int = 10,
+    hackernews_results: int = 10,
+    pastebin_results: int = 10,
+    youtube_results: int = 10,
+    shodan_results: int = 10,
+    telegram_results: int = 10,
+    rss_results: int = 10,
     enable_sentiment: bool = True,
 ) -> List[Mention]:
     """Synchronous wrapper for collect_mentions."""
@@ -414,6 +479,12 @@ def collect_mentions_sync(
             reddit_results=reddit_results,
             news_results=news_results,
             github_results=github_results,
+            hackernews_results=hackernews_results,
+            pastebin_results=pastebin_results,
+            youtube_results=youtube_results,
+            shodan_results=shodan_results,
+            telegram_results=telegram_results,
+            rss_results=rss_results,
             enable_sentiment=enable_sentiment,
         )
     )
