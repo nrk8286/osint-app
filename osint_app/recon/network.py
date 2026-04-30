@@ -1,4 +1,4 @@
-"""Network reconnaissance: DNS lookup, IP geolocation, HTTP header analysis."""
+"""Network reconnaissance: DNS lookup, IP geolocation, HTTP header analysis, WHOIS."""
 
 import re
 import socket
@@ -11,6 +11,13 @@ try:
     REQUESTS_AVAILABLE = True
 except ImportError:
     REQUESTS_AVAILABLE = False
+
+try:
+    import whois as whois_lib
+
+    WHOIS_AVAILABLE = True
+except ImportError:
+    WHOIS_AVAILABLE = False
 
 from osint_app.models.schemas import ReconResult
 
@@ -123,3 +130,47 @@ class NetworkRecon:
             data = {"error": str(exc)}
 
         return ReconResult(target=url, recon_type="headers", data=data)
+
+    # ── WHOIS ────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def whois_lookup(domain: str) -> ReconResult:
+        """Perform a WHOIS lookup for *domain*.
+
+        Returns registration details such as registrar, creation/expiry dates,
+        name servers, and registrant info when available.
+
+        Args:
+            domain: Domain name to query (http/https prefix is stripped)
+
+        Returns:
+            ReconResult with recon_type ``"whois"``
+        """
+        if not WHOIS_AVAILABLE:
+            return ReconResult(
+                target=domain,
+                recon_type="whois",
+                data={"error": "python-whois library not installed"},
+            )
+
+        domain = re.sub(r"^https?://", "", domain).split("/")[0]
+
+        try:
+            w = whois_lib.whois(domain)
+            # Convert datetime objects to ISO strings for JSON serialisation
+            data: Dict = {}
+            for key, val in w.items():
+                if val is None:
+                    continue
+                if isinstance(val, list):
+                    data[key] = [
+                        v.isoformat() if hasattr(v, "isoformat") else str(v) for v in val
+                    ]
+                elif hasattr(val, "isoformat"):
+                    data[key] = val.isoformat()
+                else:
+                    data[key] = str(val)
+        except Exception as exc:
+            data = {"error": str(exc)}
+
+        return ReconResult(target=domain, recon_type="whois", data=data)

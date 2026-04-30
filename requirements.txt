@@ -37,6 +37,18 @@ colorama>=0.4.6
 # Optional: Caching
 redis>=5.0.0
 
+# RSS feed support
+feedparser>=6.0.0
+
+# WHOIS lookups
+python-whois>=0.9.0
+
+# Optional: Shodan IoT search (install separately: pip install shodan)
+# shodan>=1.28.0
+
+# Optional: Telegram channel monitoring (install separately: pip install telethon)
+# telethon>=1.36.0
+
 # Testing
 pytest>=7.4.0
 pytest-asyncio>=0.21.0

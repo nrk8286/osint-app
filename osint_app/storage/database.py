@@ -9,7 +9,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from osint_app.core.config import config
 from osint_app.models.schemas import Mention, SentimentScore, SourceType
-from osint_app.storage.models import Base, MentionDB
+from osint_app.storage.models import AgentLogDB, Base, MentionDB
 
 
 class DatabaseStorage:
@@ -199,6 +199,75 @@ class DatabaseStorage:
             cutoff = datetime.now() - timedelta(days=days)
             result = session.execute(delete(MentionDB).where(MentionDB.timestamp < cutoff))
             return result.rowcount or 0
+
+    # ── Agent Log ──────────────────────────────────────────────────────
+
+    def save_log_event(self, event: Dict[str, Any]) -> int:
+        """Persist a single agent activity log event to the database.
+
+        Args:
+            event: Event dict from AgentLogger (timestamp, event_type, source, keyword, …)
+
+        Returns:
+            ID of the inserted row
+        """
+        with self.get_session() as session:
+            log_entry = AgentLogDB(
+                timestamp=event.get("timestamp", datetime.now().isoformat()),
+                event_type=event.get("event_type", ""),
+                source=event.get("source", ""),
+                keyword=event.get("keyword", ""),
+                count=event.get("count"),
+                duration_ms=event.get("duration_ms"),
+                detail=event.get("detail"),
+            )
+            session.add(log_entry)
+            session.flush()
+            return log_entry.id or 0
+
+    def get_log_events(
+        self,
+        source: Optional[str] = None,
+        keyword: Optional[str] = None,
+        event_type: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> List[Dict[str, Any]]:
+        """Retrieve agent log events from the database.
+
+        Args:
+            source: Filter by source name
+            keyword: Filter by keyword
+            event_type: Filter by event type (e.g. ``"SEARCH_DONE"``)
+            limit: Maximum number of results
+            offset: Pagination offset
+
+        Returns:
+            List of event dicts ordered by id ascending
+        """
+        with self.get_session() as session:
+            stmt = select(AgentLogDB)
+            if source:
+                stmt = stmt.where(AgentLogDB.source == source)
+            if keyword:
+                stmt = stmt.where(AgentLogDB.keyword == keyword)
+            if event_type:
+                stmt = stmt.where(AgentLogDB.event_type == event_type)
+            stmt = stmt.order_by(AgentLogDB.id).limit(limit).offset(offset)
+            rows = session.execute(stmt).scalars().all()
+            return [
+                {
+                    "id": r.id,
+                    "timestamp": r.timestamp,
+                    "event_type": r.event_type,
+                    "source": r.source,
+                    "keyword": r.keyword,
+                    "count": r.count,
+                    "duration_ms": r.duration_ms,
+                    "detail": r.detail,
+                }
+                for r in rows
+            ]
 
 
 # ---------------------------------------------------------------------------

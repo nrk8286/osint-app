@@ -25,6 +25,11 @@ class SourceTypeDB(str, enum.Enum):
     GITHUB = "github"
     WEB = "web"
     RSS = "rss"
+    HACKERNEWS = "hackernews"
+    PASTEBIN = "pastebin"
+    YOUTUBE = "youtube"
+    SHODAN = "shodan"
+    TELEGRAM = "telegram"
 
 
 class SentimentDB(str, enum.Enum):
@@ -56,3 +61,25 @@ class MentionDB(Base):
 
     def __repr__(self) -> str:
         return f"<Mention(id={self.id}, source={self.source}, keyword={self.keyword})>"
+
+
+class AgentLogDB(Base):
+    """Database model for agent activity log events."""
+
+    __tablename__ = "agent_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    timestamp: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    event_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    source: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    keyword: Mapped[str] = mapped_column(String(500), nullable=False, index=True)
+    count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    duration_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+    detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+    def __repr__(self) -> str:
+        return (
+            f"<AgentLog(id={self.id}, event_type={self.event_type}, source={self.source})>"
+        )
+

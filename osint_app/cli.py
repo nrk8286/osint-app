@@ -353,14 +353,35 @@ def main():
     parser.add_argument("--sources", help="Comma-separated source list (e.g. google,github,reddit)")
     parser.add_argument("--recon", metavar="DOMAIN", help="Run DNS/IP reconnaissance on a domain")
     parser.add_argument("--headers", metavar="URL", help="Analyze HTTP headers of a URL")
+    parser.add_argument("--whois", metavar="DOMAIN", help="Run WHOIS lookup on a domain")
     parser.add_argument("--interactive", "-i", action="store_true", help="Launch interactive menu")
+    parser.add_argument(
+        "--watch-logs",
+        action="store_true",
+        help="Watch agent activity log in real time (Ctrl-C to stop)",
+    )
+    parser.add_argument(
+        "--log-tail",
+        type=int,
+        default=30,
+        metavar="N",
+        help="Number of log lines to show with --watch-logs (default: 30)",
+    )
 
     args = parser.parse_args()
     cli = OSINTCLI()
 
+    # Watch logs mode
+    if args.watch_logs:
+        from osint_app.utils.log_display import watch_live_log
+
+        watch_live_log(tail=args.log_tail)
+        return
+
     # Interactive mode
     if args.interactive or (
         not args.keyword and not args.stats and not args.recon and not args.headers
+        and not args.whois
     ):
         asyncio.run(cli.interactive_menu())
         return
@@ -377,6 +398,11 @@ def main():
 
     if args.headers:
         result = cli.recon.check_headers(args.headers)
+        cli.print_recon_result(result)
+        return
+
+    if args.whois:
+        result = cli.recon.whois_lookup(args.whois)
         cli.print_recon_result(result)
         return
 
