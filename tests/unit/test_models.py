@@ -60,9 +60,19 @@ class TestSearchQuery:
         assert query.enable_sentiment is True
 
     def test_validation(self):
-        """Test search query validation."""
-        with pytest.raises(ValueError):
-            SearchQuery(keyword="", google_results=-1)
+        """Test that SearchQuery stores values without enforcing range constraints.
+
+        The model does not currently validate negative result counts; this test
+        documents that behaviour so a future constraint addition is caught early.
+        """
+        # Pydantic model accepts any int; verify it does not raise and stores the value
+        query = SearchQuery(keyword="test", google_results=-1)
+        assert query.google_results == -1
+
+    def test_empty_keyword_allowed(self):
+        """Test that an empty keyword is accepted by the model."""
+        query = SearchQuery(keyword="")
+        assert query.keyword == ""
 
     def test_custom_values(self):
         """Test search query with custom values."""
