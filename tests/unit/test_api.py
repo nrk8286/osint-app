@@ -148,3 +148,108 @@ class TestClearMentionsEndpoint:
     def test_delete_mentions_invalid_days_returns_422(self, client):
         response = client.delete("/api/mentions?days=0")  # ge=1
         assert response.status_code == 422
+
+
+class TestWhoisEndpoint:
+    """Tests for GET /api/recon/whois/{domain}."""
+
+    def test_whois_returns_200(self, client):
+        from osint_app.models.schemas import ReconResult
+
+        mock_result = ReconResult(
+            target="example.com",
+            recon_type="whois",
+            data={"registrar": "Test Registrar"},
+        )
+        client.mock_recon.whois_lookup.return_value = mock_result
+        response = client.get("/api/recon/whois/example.com")
+        assert response.status_code == 200
+
+    def test_whois_response_contains_target(self, client):
+        from osint_app.models.schemas import ReconResult
+
+        mock_result = ReconResult(
+            target="example.com",
+            recon_type="whois",
+            data={"registrar": "Test Registrar"},
+        )
+        client.mock_recon.whois_lookup.return_value = mock_result
+        data = client.get("/api/recon/whois/example.com").json()
+        assert data["target"] == "example.com"
+        assert data["recon_type"] == "whois"
+
+
+class TestLogsRecentEndpoint:
+    """Tests for GET /api/logs/recent."""
+
+    def test_logs_recent_returns_200(self, client):
+        response = client.get("/api/logs/recent")
+        assert response.status_code == 200
+
+    def test_logs_recent_returns_list(self, client):
+        data = client.get("/api/logs/recent").json()
+        assert isinstance(data, list)
+
+    def test_logs_recent_honours_limit(self, client):
+        response = client.get("/api/logs/recent?limit=10")
+        assert response.status_code == 200
+
+    def test_logs_recent_invalid_limit_returns_422(self, client):
+        response = client.get("/api/logs/recent?limit=0")
+        assert response.status_code == 422
+
+
+class TestAgentLogStorageIntegration:
+    """Tests for save_log_event and get_log_events on DatabaseStorage."""
+
+    def test_save_and_retrieve_log_event(self, db):
+        event = {
+            "timestamp": "2024-01-01T10:00:00+00:00",
+            "event_type": "SEARCH_DONE",
+            "source": "HackerNews",
+            "keyword": "osint",
+            "count": 7,
+            "duration_ms": 320.5,
+            "detail": None,
+        }
+        row_id = db.save_log_event(event)
+        assert row_id > 0
+
+        events = db.get_log_events(limit=10)
+        assert any(
+            e["source"] == "HackerNews" and e["event_type"] == "SEARCH_DONE" for e in events
+        )
+
+    def test_get_log_events_filters_by_source(self, db):
+        db.save_log_event(
+            {
+                "timestamp": "2024-01-01T10:00:00+00:00",
+                "event_type": "SEARCH_STARTED",
+                "source": "YouTube",
+                "keyword": "python",
+            }
+        )
+        db.save_log_event(
+            {
+                "timestamp": "2024-01-01T10:00:01+00:00",
+                "event_type": "SEARCH_STARTED",
+                "source": "Reddit",
+                "keyword": "python",
+            }
+        )
+        events = db.get_log_events(source="YouTube")
+        assert all(e["source"] == "YouTube" for e in events)
+
+    def test_get_log_events_filters_by_event_type(self, db):
+        db.save_log_event(
+            {
+                "timestamp": "2024-01-01T10:00:00+00:00",
+                "event_type": "SEARCH_ERROR",
+                "source": "Shodan",
+                "keyword": "test",
+                "detail": "quota exceeded",
+            }
+        )
+        events = db.get_log_events(event_type="SEARCH_ERROR")
+        assert all(e["event_type"] == "SEARCH_ERROR" for e in events)
+

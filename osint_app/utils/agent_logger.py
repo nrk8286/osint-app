@@ -100,12 +100,11 @@ class AgentLogger:
 
     def _setup_file_logger(self) -> None:
         """Configure a rotating JSONL file handler."""
-        self._logger = logging.getLogger("osint.agent")
+        # Use a unique name per instance so different instances (e.g. in tests)
+        # each get their own logger with their own file handler.
+        self._logger = logging.getLogger(f"osint.agent.{id(self)}")
         self._logger.setLevel(logging.DEBUG)
         self._logger.propagate = False
-
-        if self._logger.handlers:
-            return  # already configured (e.g. reimport during tests)
 
         path = Path(self.log_file)
         path.parent.mkdir(parents=True, exist_ok=True)

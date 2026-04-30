@@ -166,3 +166,64 @@ class TestCheckHeaders:
         ):
             result = NetworkRecon.check_headers("https://down.example.com")
         assert "error" in result.data
+
+
+class TestWhoisLookup:
+    """Tests for NetworkRecon.whois_lookup."""
+
+    def test_returns_error_when_whois_unavailable(self):
+        with patch("osint_app.recon.network.WHOIS_AVAILABLE", False):
+            result = NetworkRecon.whois_lookup("example.com")
+        assert result.recon_type == "whois"
+        assert "error" in result.data
+
+    def test_strips_https_prefix(self):
+        fake_whois = {"registrar": "Example Registrar", "domain_name": "EXAMPLE.COM"}
+        mock_w = MagicMock()
+        mock_w.items.return_value = fake_whois.items()
+
+        with (
+            patch("osint_app.recon.network.WHOIS_AVAILABLE", True),
+            patch("osint_app.recon.network.whois_lib.whois", return_value=mock_w),
+        ):
+            result = NetworkRecon.whois_lookup("https://example.com/path")
+
+        assert result.target == "example.com"
+
+    def test_successful_whois_returns_data(self):
+        from datetime import datetime
+
+        fake_whois_data = {
+            "domain_name": "EXAMPLE.COM",
+            "registrar": "Test Registrar, LLC",
+            "creation_date": datetime(1995, 8, 14),
+            "expiration_date": datetime(2030, 8, 13),
+            "name_servers": ["ns1.example.com", "ns2.example.com"],
+        }
+        mock_w = MagicMock()
+        mock_w.items.return_value = fake_whois_data.items()
+
+        with (
+            patch("osint_app.recon.network.WHOIS_AVAILABLE", True),
+            patch("osint_app.recon.network.whois_lib.whois", return_value=mock_w),
+        ):
+            result = NetworkRecon.whois_lookup("example.com")
+
+        assert result.recon_type == "whois"
+        assert result.target == "example.com"
+        assert "registrar" in result.data
+        assert result.data["registrar"] == "Test Registrar, LLC"
+        # datetime should be serialised as ISO string
+        assert "1995" in result.data["creation_date"]
+
+    def test_whois_exception_captured_in_data(self):
+        with (
+            patch("osint_app.recon.network.WHOIS_AVAILABLE", True),
+            patch(
+                "osint_app.recon.network.whois_lib.whois",
+                side_effect=Exception("lookup failed"),
+            ),
+        ):
+            result = NetworkRecon.whois_lookup("bad.invalid")
+        assert "error" in result.data
+

@@ -77,7 +77,7 @@ class RSSSource(BaseSource):
         for entry in feed.entries:
             title = entry.get("title", "")
             summary = entry.get("summary", "") or entry.get("description", "")
-            content_blocks = entry.get("content", [])
+            content_blocks = entry.get("content") or []
             full_content = " ".join(c.get("value", "") for c in content_blocks) if content_blocks else ""
             text_to_search = f"{title} {summary} {full_content}"
 
@@ -94,6 +94,7 @@ class RSSSource(BaseSource):
             else:
                 ts = datetime.now(timezone.utc)
 
+            tags = entry.get("tags") or []
             mention = Mention(
                 source=SourceType.RSS,
                 keyword=keyword,
@@ -105,7 +106,7 @@ class RSSSource(BaseSource):
                 metadata={
                     "feed_url": feed_url,
                     "feed_title": feed.feed.get("title", ""),
-                    "tags": [t.get("term") for t in entry.get("tags", [])],
+                    "tags": [t.get("term") for t in tags if isinstance(t, dict)],
                 },
             )
             mentions.append(mention)
