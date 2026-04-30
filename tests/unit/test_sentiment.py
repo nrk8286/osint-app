@@ -1,7 +1,7 @@
 """Unit tests for sentiment analysis."""
 
 import pytest
-from osint_app.utils.sentiment import SimpleSentimentAnalyzer, SentimentScore
+from osint_app.utils.sentiment import SimpleSentimentAnalyzer, SentimentScore, get_sentiment_analyzer
 from osint_app.models.schemas import Mention, SourceType
 
 
@@ -49,3 +49,44 @@ class TestSimpleSentimentAnalyzer:
         analyzed = self.analyzer.analyze_mention(mention)
         assert analyzed.sentiment is not None
         assert analyzed.sentiment_confidence is not None
+
+    def test_mixed_positive_negative_resolves_to_neutral(self):
+        """Equal positive and negative counts → neutral."""
+        text = "good bad"  # one positive, one negative
+        sentiment, confidence = self.analyzer.analyze(text)
+        assert sentiment == SentimentScore.NEUTRAL
+        assert confidence == 0.5
+
+    def test_mostly_positive_words(self):
+        """Heavily positive text should yield positive sentiment."""
+        text = "great excellent amazing wonderful awesome love"
+        sentiment, confidence = self.analyzer.analyze(text)
+        assert sentiment == SentimentScore.POSITIVE
+        assert confidence > 0.6
+
+    def test_mostly_negative_words(self):
+        """Heavily negative text should yield negative sentiment."""
+        text = "terrible horrible awful hate disappointing useless"
+        sentiment, confidence = self.analyzer.analyze(text)
+        assert sentiment == SentimentScore.NEGATIVE
+        assert confidence > 0.6
+
+    def test_confidence_is_numeric(self):
+        """Confidence value should be a float."""
+        _, confidence = self.analyzer.analyze("This is good")
+        assert isinstance(confidence, float)
+
+
+class TestGetSentimentAnalyzer:
+    """Tests for the get_sentiment_analyzer factory function."""
+
+    def test_returns_simple_analyzer_when_transformers_disabled(self):
+        analyzer = get_sentiment_analyzer(use_transformers=False)
+        assert isinstance(analyzer, SimpleSentimentAnalyzer)
+
+    def test_returns_simple_analyzer_when_transformers_unavailable(self):
+        from unittest.mock import patch
+
+        with patch("osint_app.utils.sentiment.TRANSFORMERS_AVAILABLE", False):
+            analyzer = get_sentiment_analyzer(use_transformers=True)
+        assert isinstance(analyzer, SimpleSentimentAnalyzer)
