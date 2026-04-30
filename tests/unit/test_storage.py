@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from osint_app.models.schemas import Mention, SentimentScore, SourceType
+from osint_app.models.schemas import Mention, SourceType
 from osint_app.storage.database import Database, DatabaseStorage
 
 
