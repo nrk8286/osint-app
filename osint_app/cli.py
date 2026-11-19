@@ -2,14 +2,12 @@
 
 import argparse
 import asyncio
-import sys
 from typing import Optional
 
 try:
     from rich.console import Console
     from rich.panel import Panel
     from rich.progress import Progress, SpinnerColumn, TextColumn
-    from rich.prompt import IntPrompt, Prompt
     from rich.table import Table
 
     RICH_AVAILABLE = True
@@ -380,7 +378,10 @@ def main():
 
     # Interactive mode
     if args.interactive or (
-        not args.keyword and not args.stats and not args.recon and not args.headers
+        not args.keyword
+        and not args.stats
+        and not args.recon
+        and not args.headers
         and not args.whois
     ):
         asyncio.run(cli.interactive_menu())

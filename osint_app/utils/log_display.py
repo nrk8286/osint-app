@@ -10,7 +10,7 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional, Protocol
 
 try:
     from rich.console import Console
@@ -73,7 +73,13 @@ def _read_events(log_file: str, tail: int) -> list:
         return []
 
 
-def _render_table(events: list, console: Optional[object] = None) -> None:
+class ConsoleLike(Protocol):
+    def print(self, *objects: object, **kwargs: Any) -> None:
+        """Print objects using the console's configured renderer."""
+        ...
+
+
+def _render_table(events: list, console: Optional[ConsoleLike] = None) -> None:
     """Render events as a rich table or plain text."""
     if not events:
         if RICH_AVAILABLE and console:
@@ -116,16 +122,19 @@ def _render_table(events: list, console: Optional[object] = None) -> None:
 
         console.print(table)
     else:
-        header = f"{'Time':<10}  {'Source':<14}  {'Event':<22}  {'Keyword':<20}  {'Cnt':>5}  {'ms':>7}  Detail"
+        header = (
+            f"{'Time':<10}  {'Source':<14}  {'Event':<22}  "
+            f"{'Keyword':<20}  {'Cnt':>5}  {'ms':>7}  Detail"
+        )
         print(header)
         print("-" * len(header))
         for ev in events:
             ts = ev.get("timestamp", "")
             ts_short = ts[11:19] if len(ts) >= 19 else ts
             print(
-                f"{ts_short:<10}  {ev.get('source',''):<14}  {ev.get('event_type',''):<22}  "
-                f"{ev.get('keyword',''):<20}  {str(ev.get('count',''))!s:>5}  "
-                f"{str(ev.get('duration_ms',''))!s:>7}  {ev.get('detail','')}"
+                f"{ts_short:<10}  {ev.get('source', ''):<14}  {ev.get('event_type', ''):<22}  "
+                f"{ev.get('keyword', ''):<20}  {str(ev.get('count', ''))!s:>5}  "
+                f"{str(ev.get('duration_ms', ''))!s:>7}  {ev.get('detail', '')}"
             )
 
 

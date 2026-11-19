@@ -4,9 +4,9 @@ import os
 from datetime import datetime
 from typing import List, Optional
 
-from osint_app.models import Mention, SearchQuery
+from osint_app.models.legacy import Mention, SearchQuery
 from osint_app.monitors.base import BaseMonitor
-from osint_app.utils import analyze_sentiment, format_engagement
+from osint_app.monitors.helpers import analyze_sentiment, format_engagement
 
 
 class TwitterMonitor(BaseMonitor):
@@ -93,8 +93,8 @@ class TwitterMonitor(BaseMonitor):
             mention = Mention(
                 platform="Twitter",
                 content=tweet,
-                author=f"@user{i+1}",
-                url=f"https://twitter.com/user{i+1}/status/{1000000+i}",
+                author=f"@user{i + 1}",
+                url=f"https://twitter.com/user{i + 1}/status/{1000000 + i}",
                 timestamp=datetime.now(),
                 engagement=format_engagement(
                     likes=10 * (i + 1), shares=5 * (i + 1), comments=2 * (i + 1)

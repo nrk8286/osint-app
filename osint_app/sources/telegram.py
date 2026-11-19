@@ -6,13 +6,11 @@ Requires the ``telethon`` package and valid Telegram API credentials
 The source is disabled gracefully when credentials or the library are absent.
 """
 
-import asyncio
 from datetime import datetime, timezone
 from typing import List
 
 try:
     from telethon import TelegramClient
-    from telethon.errors import SessionPasswordNeededError
     from telethon.tl.functions.contacts import SearchRequest
 
     TELETHON_AVAILABLE = True

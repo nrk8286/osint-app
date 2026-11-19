@@ -1,9 +1,9 @@
 """Base monitor class for all social media monitors."""
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List
 
-from osint_app.models import Mention, SearchQuery
+from osint_app.models.legacy import Mention, SearchQuery
 
 
 class BaseMonitor(ABC):
