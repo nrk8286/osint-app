@@ -1,6 +1,5 @@
 """News API source integration."""
 
-import asyncio
 from datetime import datetime
 from typing import List
 

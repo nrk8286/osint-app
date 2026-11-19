@@ -78,7 +78,9 @@ class RSSSource(BaseSource):
             title = entry.get("title", "")
             summary = entry.get("summary", "") or entry.get("description", "")
             content_blocks = entry.get("content") or []
-            full_content = " ".join(c.get("value", "") for c in content_blocks) if content_blocks else ""
+            full_content = (
+                " ".join(c.get("value", "") for c in content_blocks) if content_blocks else ""
+            )
             text_to_search = f"{title} {summary} {full_content}"
 
             if kw_lower not in text_to_search.lower():
@@ -88,7 +90,7 @@ class RSSSource(BaseSource):
             published = entry.get("published_parsed") or entry.get("updated_parsed")
             if published:
                 try:
-                    ts = datetime(*published[:6], tzinfo=timezone.utc)
+                    ts = datetime(*published[:6]).replace(tzinfo=timezone.utc)
                 except Exception:
                     ts = datetime.now(timezone.utc)
             else:

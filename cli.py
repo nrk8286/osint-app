@@ -6,7 +6,7 @@ import json
 import sys
 from typing import List
 from osint_app.app import OSINTApp
-from osint_app.models import Mention
+from osint_app.models.legacy import Mention
 
 try:
     from dotenv import load_dotenv

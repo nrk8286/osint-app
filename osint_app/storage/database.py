@@ -5,10 +5,10 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import JSON, Column, DateTime, Integer, String, create_engine, delete, func, select
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from osint_app.core.config import config
-from osint_app.models.schemas import Mention, SentimentScore, SourceType
+from osint_app.models.schemas import Mention, SourceType
 from osint_app.storage.models import AgentLogDB, Base, MentionDB
 
 
@@ -70,7 +70,7 @@ class DatabaseStorage:
             )
             session.add(db_mention)
             session.flush()
-            return db_mention.id
+            return int(db_mention.id)
 
     def save_mentions(self, mentions: List[Mention]) -> int:
         """Save multiple mentions to database.
@@ -280,7 +280,9 @@ class DatabaseStorage:
 # To keep both working, we provide a small adapter implementation here.
 # ---------------------------------------------------------------------------
 
-_CompatBase = declarative_base()
+
+class _CompatBase(DeclarativeBase):
+    pass
 
 
 class _MentionCompat(_CompatBase):

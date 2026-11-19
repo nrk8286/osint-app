@@ -18,13 +18,11 @@ Usage::
 import asyncio
 import json
 import logging
-import os
 from collections import deque
 from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional
-
 
 # ---------------------------------------------------------------------------
 # ANSI colour helpers (used for stderr output)
@@ -33,10 +31,10 @@ from typing import Any, Deque, Dict, List, Optional
 _RESET = "\033[0m"
 _BOLD = "\033[1m"
 _COLOURS = {
-    "SEARCH_STARTED": "\033[36m",   # cyan
-    "SEARCH_DONE": "\033[32m",      # green
-    "SEARCH_ERROR": "\033[31m",     # red
-    "STEP": "\033[33m",             # yellow
+    "SEARCH_STARTED": "\033[36m",  # cyan
+    "SEARCH_DONE": "\033[32m",  # green
+    "SEARCH_ERROR": "\033[31m",  # red
+    "STEP": "\033[33m",  # yellow
     "COLLECTION_STARTED": "\033[35m",  # magenta
     "COLLECTION_DONE": "\033[34m",  # blue
 }
@@ -121,9 +119,7 @@ class AgentLogger:
         """Log a SEARCH_STARTED event."""
         self._log_event("SEARCH_STARTED", source_name, keyword)
 
-    def agent_result(
-        self, source_name: str, keyword: str, count: int, duration_ms: float
-    ) -> None:
+    def agent_result(self, source_name: str, keyword: str, count: int, duration_ms: float) -> None:
         """Log a SEARCH_DONE event with result count and timing."""
         self._log_event(
             "SEARCH_DONE",

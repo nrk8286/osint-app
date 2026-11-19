@@ -18,7 +18,7 @@ class BaseCollector(ABC):
             keywords: List of keywords to monitor
         """
         self.keywords = keywords
-        self.results = []
+        self.results: List[Dict[str, Any]] = []
 
     @abstractmethod
     def collect(self) -> List[Dict[str, Any]]:

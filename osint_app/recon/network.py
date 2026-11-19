@@ -2,7 +2,6 @@
 
 import re
 import socket
-from datetime import datetime
 from typing import Dict, Optional
 
 try:
@@ -163,9 +162,7 @@ class NetworkRecon:
                 if val is None:
                     continue
                 if isinstance(val, list):
-                    data[key] = [
-                        v.isoformat() if hasattr(v, "isoformat") else str(v) for v in val
-                    ]
+                    data[key] = [v.isoformat() if hasattr(v, "isoformat") else str(v) for v in val]
                 elif hasattr(val, "isoformat"):
                     data[key] = val.isoformat()
                 else:

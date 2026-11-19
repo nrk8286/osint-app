@@ -59,7 +59,7 @@ class ReportGenerator:
         report.append("")
 
         # Source breakdown
-        sources = {}
+        sources: Dict[str, int] = {}
         for mention in mentions:
             source = mention.get("source", "unknown")
             sources[source] = sources.get(source, 0) + 1
@@ -91,9 +91,7 @@ class ReportGenerator:
 
         return "\n".join(report)
 
-    def generate_json(
-        self, mentions: List[Dict[str, Any]], sentiment_stats: Dict[str, Any]
-    ) -> str:
+    def generate_json(self, mentions: List[Dict[str, Any]], sentiment_stats: Dict[str, Any]) -> str:
         """
         Generate a JSON report.
 

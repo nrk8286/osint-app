@@ -1,5 +1,11 @@
 # OSINT App - Social Media Monitoring Tool
 
+The original root `cli.py` and `OSINTApp` interface use synthetic demo monitors.
+Their results are examples, not evidence collected from live services. The v2
+collector CLI is available through `python -m osint_app.cli`; individual sources
+require their documented configuration. The compatibility models for the demo
+CLI are kept separate from the v2 collector schemas.
+
 A simple OSINT (Open Source Intelligence) application for monitoring social media mentions, similar to Talkwalker. This tool helps you track keywords across various sources including web search, news articles, and social media platforms.
 
 ## Features

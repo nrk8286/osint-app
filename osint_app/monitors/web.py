@@ -3,9 +3,9 @@
 from datetime import datetime
 from typing import List
 
-from osint_app.models import Mention, SearchQuery
+from osint_app.models.legacy import Mention, SearchQuery
 from osint_app.monitors.base import BaseMonitor
-from osint_app.utils import analyze_sentiment, format_engagement
+from osint_app.monitors.helpers import analyze_sentiment, format_engagement
 
 
 class WebMonitor(BaseMonitor):
@@ -55,8 +55,8 @@ class WebMonitor(BaseMonitor):
             mention = Mention(
                 platform="Web",
                 content=article,
-                author=f"Author {i+1}",
-                url=f"https://example.com/article-{i+1}",
+                author=f"Author {i + 1}",
+                url=f"https://example.com/article-{i + 1}",
                 timestamp=datetime.now(),
                 engagement=format_engagement(
                     likes=30 * (i + 1), shares=10 * (i + 1), comments=8 * (i + 1)

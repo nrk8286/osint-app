@@ -89,9 +89,7 @@ class YouTubeSource(BaseSource):
                     metadata={
                         "video_id": video_id,
                         "channel_id": snippet.get("channelId"),
-                        "thumbnail": snippet.get("thumbnails", {})
-                        .get("default", {})
-                        .get("url"),
+                        "thumbnail": snippet.get("thumbnails", {}).get("default", {}).get("url"),
                     },
                 )
                 mentions.append(mention)

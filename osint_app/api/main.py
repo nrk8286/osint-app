@@ -3,16 +3,16 @@
 import asyncio
 import json
 from datetime import datetime
-from typing import AsyncIterator, List, Optional
+from typing import AsyncIterator, Optional
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from osint_app.core.config import config
 from osint_app.core.monitor import OSINTMonitor
-from osint_app.models.schemas import Mention, ReconResult, SearchQuery, SourceType
+from osint_app.models.schemas import SearchQuery, SourceType
 from osint_app.recon.network import NetworkRecon
 from osint_app.storage.database import DatabaseStorage
 from osint_app.utils.agent_logger import agent_logger
